@@ -393,8 +393,8 @@
 			bombDir = 0; // direction of bomb. 0 = left, 1 = right
 			beetleFrame = 0;
 			beetleBounds = new Rectangle((WIDTH / 2) - (SPRITE_WIDTH / 2), HEIGHT - SPRITE_HEIGHT - (SPRITE_HEIGHT / 2), SPRITE_WIDTH, SPRITE_HEIGHT);
-			images.heartBounds = new Rectangle(-images.heart.width, -images.heart.height, images.heart.width, images.heart.height);
-			images.bombBounds = new Rectangle(-images.bomb.width, -images.bomb.height, 40, 40);
+			heartBounds = new Rectangle(-images.heart.width, -images.heart.height, images.heart.width, images.heart.height);
+			bombBounds = new Rectangle(-images.bomb.width, -images.bomb.height, 40, 40);
 			animFrame = 0;
 			animTime = 0;
 			blinkTime = 0;
@@ -477,17 +477,17 @@
 			for (j = 0; j < str.length; j += 1) {
 				w = 0;
 
-				if (s.charAt(j) === ':') {
+				if (str.charAt(j) === ':') {
 					n = 10;
 					w = -5;
 				} else {
-					n = parseInt(s.charAt(j));
-					if (j < s.length - 1 && s.charAt(j + 1) === ':') {
+					n = parseInt(str.charAt(j));
+					if (j < str.length - 1 && str.charAt(j + 1) === ':') {
 						w = -5;
 					}
 				}
 
-				ctx.drawImage(digits[n], x, y);
+				ctx.drawImage(images.digits[n], x, y);
 				x += 25 + w;
 			}
 		}
@@ -498,7 +498,7 @@
 			x = WIDTH - 5;
 			for (j = s.length-1; j >= 0; j -= 1) {
 				x -= 25;
-				ctx.drawImage(digits[parseInt(s.charAt(j))], x, 5);
+				ctx.drawImage(images.digits[parseInt(s.charAt(j))], x, 5);
 			}
 
 			ctx.drawImage(images.score, x - images.score.width - 5, 5);
@@ -599,7 +599,7 @@
 				}
 
 				// bullet firing
-				if (!squished && isKeyDown(keys.space)) {
+				if (!squished && isKeyDown(keys.spacebar)) {
 					for (j = 0;j < bullets.length;j++) {
 						if (bullets[j][1] <= -SPRITE_HEIGHT) {
 							bullets[j][0] = beetleBounds.x;
@@ -607,7 +607,7 @@
 							break;
 						}
 					}
-					keys[Input.KEY_SPACE&0xff] = 2;
+					keys[keys.spacebar] = -2;
 				}
 
 				// bullet movement
@@ -776,9 +776,9 @@
 			if (state == STATE_GAME) {
 				if (squished) {
 					squishTime+=delta;
-					if (isKeyDown(keys.space)) {
+					if (isKeyDown(keys.spacebar)) {
 						pressCount++;
-						keys[keys.space] = -1;
+						keys[keys.spacebar] = -1;
 					}
 
 					if (pressCount == pressMax) {
@@ -791,9 +791,9 @@
 					}
 				}
 			} else if (state == STATE_TITLE) {
-				if (isKeyDown(keys.space)) {
+				if (isKeyDown(keys.spacebar)) {
 					state = STATE_GAME;
-					keys[keys.space] = -1;
+					keys[keys.spacebar] = -1;
 				}
 			} else if (state == STATE_GAME_OVER) {
 				if (isKeyDown(keys.r)) {
@@ -802,8 +802,8 @@
 					state = STATE_GAME;
 				}
 			} else if (state == STATE_SCORES || state == STATE_ERROR) {
-				if (isKeyDown(keys.space)) {
-					keys[keys.space] = -1;
+				if (isKeyDown(keys.spacebar)) {
+					keys[keys.spacebar] = -1;
 					reset();
 					state = STATE_GAME;
 				}
@@ -826,35 +826,35 @@
 			}
 
 			if (state == STATE_GAME) {
-				if (bombBounds.x > -bomb.width) {
+				if (bombBounds.x > -images.bomb.width) {
 					ctx.drawImage(bomb, (!bombDir && bombBounds.x) || WIDTH-bombBounds.x, bombBounds.y - 59);
 				}
 
 				if (blinkTime <= 0 || blinkState == 0) {
-					ctx.drawImage(beetle[beetleFrame + (squished && 2) || 0], beetleBounds.x, beetleBounds.y);
+					ctx.drawImage(images.beetle[beetleFrame + (squished && 2) || 0], beetleBounds.x, beetleBounds.y);
 				}
 
 				for (j = 0;j < numShells;j++) {
-					ctx.drawImage(shell[animFrame], shells[j][0], shells[j][1]);
+					ctx.drawImage(images.shell[animFrame], shells[j][0], shells[j][1]);
 				}
 
 				for (j = 0;j  < bullets.length;j++) {
 					if (bullets[j][1] > -SPRITE_HEIGHT) {
-						ctx.drawImage(star[animFrame], bullets[j][0], bullets[j][1]);
+						ctx.drawImage(images.star[animFrame], bullets[j][0], bullets[j][1]);
 					}
 				}
 
 				for (j = 0;j < stars.length;j++) {
 					if (stars[j][5] > 0.0) {
-						ctx.drawImage(star[4 + animFrame], stars[j][0], stars[j][1]);
+						ctx.drawImage(images.star[4 + animFrame], stars[j][0], stars[j][1]);
 					}
 				}
 
 				secs = timeLeft / 1000;
-				mins = secs / 60;
-				secs %= 60;
+				mins = Math.floor(secs / 60);
+				secs = Math.floor(secs % 60);
 				ctx.drawImage(images.timeLeft, 5, 5);
-				drawTime(ctx, String(mins) + ':' + (secs < 10 && '0' + String(secs)) || String(secs), images.timeLeft.width + 10, 5);
+				drawTime(ctx, String(mins) + ':' + ((secs < 10 && '0' + String(secs)) || String(secs)), images.timeLeft.width + 10, 5);
 
 				for (j = 0;j < points.length;j++) {
 					if (points[j][3] > 0) {
@@ -922,8 +922,6 @@
 				if (keys[code] !== -1) {
 					keys[code] = 1;
 				}
-
-				update(Date.now(), true);
 			},
 
 			keyReleased: function (code) {
