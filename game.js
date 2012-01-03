@@ -256,6 +256,17 @@
 			};
 		}
 
+		function resetShell(j) {
+			shells[j][0] = rand(0,WIDTH); // x
+			shells[j][1] = -SPRITE_HEIGHT; // y
+			shells[j][2] = 2.0;
+			shells[j][3] = 0.0; // y velocity
+			points[j][0] = 0; // x
+			points[j][1] = 0; // y
+			points[j][2] = 0; // score
+			points[j][3] = 0; // life
+		}
+
 		function init() {
 			var j;
 			showFPS = false;
