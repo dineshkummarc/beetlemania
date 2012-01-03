@@ -119,6 +119,13 @@
 			digits = [],
 			timer = [],
 			heart,
+			fontCharMap = {
+				'_': 36,
+				'-': 37,
+				'.': 38,
+				':': 39,
+				' ': 40
+			},
 			images = {
 				font: null,
 				score: null,
@@ -320,6 +327,39 @@
 
 			timeLeft = GAME_DURATION;
 			state = STATE_TITLE;
+		}
+
+		function getChar(chr) { 
+			var x = chr.toUpperCase().charCodeAt(0);
+
+			if (x >= 65 && x <= 90) { // A-Z
+				return x-65;
+			}
+			else if (x >= 48 && x <= 57) { // 0-9
+				return 26+x-48;
+			} else if (typeof fontCharMap[c] === 'number') {
+				return fontCharMap[c];
+			}
+
+			return 41;
+		}
+
+		function isCharSupported(chr) {
+			var x = chr.toUpperCase().charCodeAt(0);
+			return ((x >= 65 && x <= 90) || (x >= 48 && x <= 57) || typeof fontCharMap[c] === 'number');
+		}
+
+		function drawText(context, str, x, y) {
+			var j, startx = 0 + x;
+			for (j = 0; j < str.length; j += 1) {
+				if (s.charAt(j) === '\n') {
+					y += 16 + 8;
+					x = 0 + startx;
+				} else {
+					x += 16;
+					context.drawImage(font[getChar(s.charAt(j))], x - 16, y);
+				}
+			}
 		}
 
 		function update(delta) {
