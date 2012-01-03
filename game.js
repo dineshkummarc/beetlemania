@@ -446,8 +446,8 @@
 			}
 			else if (x >= 48 && x <= 57) { // 0-9
 				return 26+x-48;
-			} else if (typeof fontCharMap[c] === 'number') {
-				return fontCharMap[c];
+			} else if (typeof fontCharMap[chr] === 'number') {
+				return fontCharMap[chr];
 			}
 
 			return 41;
@@ -461,12 +461,12 @@
 		function drawText(ctx, str, x, y) {
 			var j, startx = 0 + x;
 			for (j = 0; j < str.length; j += 1) {
-				if (s.charAt(j) === '\n') {
+				if (str.charAt(j) === '\n') {
 					y += 16 + 8;
 					x = 0 + startx;
 				} else {
 					x += 16;
-					ctx.drawImage(font[getChar(s.charAt(j))], x - 16, y);
+					ctx.drawImage(images.font[getChar(str.charAt(j))], x - 16, y);
 				}
 			}
 		}
@@ -896,7 +896,7 @@
 			} else if (state == STATE_GAME_OVER) {
 				ctx.drawImage(images.gameOver, (WIDTH / 2) - (images.gameOver.width / 2), 10);
 				drawText(ctx, 'Your Score: ' + score + '\n\n-Press -ENTER- to submit score\n\n-Press -R- to restart game', 10, 150);
-				ctx.drawImage(beetle[(squished && 2 || 0)], beetleBounds.x, beetleBounds.y);
+				ctx.drawImage(images.beetle[(squished && 2 || 0)], beetleBounds.x, beetleBounds.y);
 			}
 
 			if (showFPS) {
@@ -962,15 +962,15 @@
 
 		tw = this.width;
 		th = this.height;
-		rw = r.width;
-		rh = r.height;
+		rw = rect.width;
+		rh = rect.height;
 		if (rw <= 0 || rh <= 0 || tw <= 0 || th <= 0) {
 			return false;
 		}
 		tx = this.x;
 		ty = this.y;
-		rx = r.x;
-		ry = r.y;
+		rx = rect.x;
+		ry = rect.y;
 		rw += rx;
 		rh += ry;
 		tw += tx;
