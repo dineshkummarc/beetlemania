@@ -67,7 +67,75 @@
 
 
 	game = (function () {
-		var keys;
+		var keys,
+			WIDTH = 512,
+			HEIGHT = 448,
+			SPRITE_WIDTH = 32,
+			SPRITE_HEIGHT = 32,
+			NUM_STARS = 15, // stars per shell
+			BG = '#339966',
+			GRAV = 0.05,
+			MAX_SQUISH_TIME = 5000,
+			MAX_BLINK_TIME = 2000,
+			STATE_TITLE = 0,
+			STATE_GAME = 1,
+			STATE_GAME_OVER = 2,
+			STATE_INPUT = 3,
+			STATE_SUBMITTING = 4,
+			STATE_ERROR = 5,
+			STATE_SCORES = 6,
+			GAME_DURATION = 3*60*1000,
+			state, // game state
+			beetle = [],
+			shell = [],
+			star = [],
+			digits = [],
+			timer = [],
+			heart,
+			bg,
+			scoreImg,
+			msgImgs = [],
+			bomb,
+			font = [],
+			title,
+			space,
+			gameOver,
+			timeLeftImg,
+			beetleBounds,
+			heartBounds,
+			bombBounds,
+			frame,
+			beetleTime,
+			bgTime,
+			animTime,
+			moveTime,
+			squishTime,
+			scroll,
+			beetleFrame,
+			animFrame,
+			numShells,
+			maxShells,
+			keys = [],
+			bullets = [],
+			score,
+			points = [],
+			blinkTime,
+			blinkState,
+			msg = [],
+			bombScore,
+			bombDir,
+			timeLeft,
+			inputChars = [],
+			input,
+			shells = [],
+			stars = [],
+			fps,
+			mute,
+			squished,
+			showFPS,
+			pressCount, // times spacebar was pressed while squished
+			pressMax, // times spacebar must be pressed to recover from being squished
+			done;
 
 		keys = {
 			spacebar: 32,
@@ -81,7 +149,7 @@
 		}
 
 		function render(ctx) {
-			ctx.fillStyle = '#339966';
+			ctx.fillStyle = BG;
 			ctx.fillRect(0, 0, width, height);
 		}
 
