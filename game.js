@@ -267,6 +267,59 @@
 		}
 
 		function reset() {
+			var j;
+			score = 0;
+			frame = 0;
+			bgTime = 0;
+			beetleTime = 0;
+			moveTime = 0;
+			bombScore = 500; // the minimum score needed before bomb bonus can appear
+			bombDir = 0; // direction of bomb. 0 = left, 1 = right
+			beetleFrame = 0;
+			beetleBounds = new Rectangle((WIDTH / 2) - (SPRITE_WIDTH / 2), HEIGHT - SPRITE_HEIGHT - (SPRITE_HEIGHT / 2), SPRITE_WIDTH, SPRITE_HEIGHT);
+			heartBounds = new Rectangle(-heart.width, -heart.height, heart.width, heart.height);
+			bombBounds = new Rectangle(-bomb.width, -bomb.height, 40, 40);
+			animFrame = 0;
+			animTime = 0;
+			blinkTime = 0;
+			blinkState = 0;
+			squished = false;
+			numShells = 0;
+			maxShells = 1;
+			scores = '';
+			pressMax = 15;
+			squishTime = 0;
+			fps = 'FPS: 0';
+			input = '';
+
+			for (j = 0;j < shells.length;j++) {
+				shells[j][0] = rand(0, WIDTH); // x
+				shells[j][1] = -SPRITE_HEIGHT; // y
+				shells[j][2] = 2.0;
+				shells[j][3] = 0.0; // y velocity
+
+				points[j][0] = 0; // x
+				points[j][1] = 0; // y
+				points[j][2] = 0; // score
+				points[j][3] = 0; // life
+			}
+
+			for (j = 0;j < stars.length;j++) {
+				stars[j][0] = rand(0, WIDTH); // x
+				stars[j][1] = 100.0; // y
+				stars[j][2] = 10; // velocity
+				stars[j][3] = rand(0, 360); // degree of movement
+				stars[j][4] = 1.0; // score amount (2^stars[j][4])
+				stars[j][5] = 0.0; // time to live
+			}
+
+			for (j = 0;j < bullets.length;j++) {
+				bullets[j][0] = 0; // x
+				bullets[j][1] = -SPRITE_HEIGHT; // y
+			}
+
+			timeLeft = GAME_DURATION;
+			state = STATE_TITLE;
 		}
 
 		function update(delta) {
