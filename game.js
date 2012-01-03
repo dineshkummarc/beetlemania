@@ -33,9 +33,18 @@
 		return min + Math.floor(Math.random() * (max - min));
 	}
 
-	Math.toRadians = Math.toRadians || function (degrees) {
-		return degrees * (Math.PI / 180);
-	};
+	function createArray(length, map) {
+		var result = [], j;
+		for (j = 0; j < length; j += 1) {
+			if (typeof map === 'function') {
+				result.push(map(j));
+			} else {
+				result.push(null);
+			}
+		}
+
+		return result;
+	}
 
 	function getSubImage(image, x, y, width, height) {
 		var canvas, ctx;
@@ -49,6 +58,10 @@
 
 		return canvas;
 	}
+
+	Math.toRadians = Math.toRadians || function (degrees) {
+		return degrees * (Math.PI / 180);
+	};
 
 	repaint = window.requestAnimationFrame ||
 		window.webkitRequestAnimationFrame ||
@@ -148,7 +161,6 @@
 			bombScore,
 			bombDir,
 			timeLeft,
-			inputChars = [],
 			input,
 			shells = [],
 			stars = [],
@@ -189,9 +201,6 @@
 			postLoad = function () {
 				var j;
 
-				images.score = files.score;
-				images.bg = files.bg;
-
 				images.beetle = [];
 				for (j = 0;j < 4;j += 1) {
 					images.beetle[j] = getSubImage(files.sprites, j * SPRITE_WIDTH, 0, SPRITE_WIDTH, SPRITE_HEIGHT);
@@ -225,6 +234,9 @@
 				images.gameOver = files.gameover;
 				images.highscores = files.highscores;
 				images.timeLeft = files.time;
+				images.score = files.score;
+				images.bg = files.bg;
+
 
 				images.font = [];
 				for (j = 0;j < 42;j++) {
@@ -234,6 +246,27 @@
 		}
 
 		function init() {
+			var j;
+			showFPS = false;
+			bullets = createArray(10);
+			shells = createArray(35);
+			points = createArray(shells.length); // points is the score increase displayed on the screen
+
+			// there are NUM_STARS stars per shell
+			stars = createArray(NUM_STARS * shells.length);
+
+			// big messages on screen
+			msg = [];
+			msg[0] = 0; // message type (index to images.messages[])
+			msg[1] = 0; // time to live (in milliseconds)
+
+			pressCount = 0;
+			scroll = 0;
+			done = false;
+			reset();
+		}
+
+		function reset() {
 		}
 
 		function update(delta) {
