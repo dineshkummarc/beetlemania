@@ -895,7 +895,7 @@
 				}
 			} else if (state == STATE_GAME_OVER) {
 				ctx.drawImage(images.gameOver, (WIDTH / 2) - (images.gameOver.width / 2), 10);
-				drawText(ctx, 'Your Score: ' + score + '\n\n-Press -ENTER- to submit score\n\n-Press -R- to restart game', 10, 150);
+				drawText(ctx, 'Your Score: ' + score + '\n\n-Press -R- to restart game', 10, 150);
 				ctx.drawImage(images.beetle[(squished && 2 || 0)], beetleBounds.x, beetleBounds.y);
 			}
 
