@@ -107,6 +107,7 @@
 			timer = [],
 			heart,
 			images = {
+				font: null,
 				score: null,
 				bg: null,
 				beetle: null,
@@ -186,40 +187,37 @@
 			});
 
 			postLoad = function () {
-				var j, sprites, sprites2, tmp;
+				var j;
 
 				images.score = files.score;
 				images.bg = files.bg;
-				sprites = files.sprites;
 
 				images.beetle = [];
 				for (j = 0;j < 4;j += 1) {
-					images.beetle[j] = getSubImage(sprites, j * SPRITE_WIDTH, 0, SPRITE_WIDTH, SPRITE_HEIGHT);
+					images.beetle[j] = getSubImage(files.sprites, j * SPRITE_WIDTH, 0, SPRITE_WIDTH, SPRITE_HEIGHT);
 				}
 
 				images.shell = [];
 				for (j = 4;j < 8;j += 1) {
-					images.shell[j - 4] = getSubImage(sprites, j * SPRITE_WIDTH, 0, SPRITE_WIDTH, SPRITE_HEIGHT);
+					images.shell[j - 4] = getSubImage(files.sprites, j * SPRITE_WIDTH, 0, SPRITE_WIDTH, SPRITE_HEIGHT);
 				}
 
 				images.star = [];
 				for (j = 8;j < 16;j += 1) {
-					images.star[j - 8] = getSubImage(sprites, j * SPRITE_WIDTH, 0, SPRITE_WIDTH, SPRITE_HEIGHT);
+					images.star[j - 8] = getSubImage(files.sprites, j * SPRITE_WIDTH, 0, SPRITE_WIDTH, SPRITE_HEIGHT);
 				}
 
 				images.digits = [];
-				tmp = files.digits;
-				for (j = 0;j < 11;j++) {
-					images.digits[j] = getSubImage(tmp, j * 25, 0, 25, 26);
+				for (j = 0;j < 11;j += 1) {
+					images.digits[j] = getSubImage(files.digits, j * 25, 0, 25, 26);
 				}
 
 				images.timer = [];
-				sprites2 = files.sprites2;
-				for (j = 0; j < 3; j++) {
-					images.timer[j] = getSubImage(sprites2, j * 24, 0, 24, 26);
+				for (j = 0; j < 3; j += 1) {
+					images.timer[j] = getSubImage(files.sprites2, j * 24, 0, 24, 26);
 				}
 
-				images.heart = getSubImage(sprites2, timer.length*24, 2, 22, 22);
+				images.heart = getSubImage(files.sprites2, timer.length * 24, 2, 22, 22);
 				images.messages = [files.great, files.hp, files.nice];
 				images.bomb = files.bomb;
 				images.space = files.space;
@@ -228,11 +226,11 @@
 				images.highscores = files.highscores;
 				images.timeLeft = files.time;
 
-				loadFont();
+				images.font = [];
+				for (j = 0;j < 42;j++) {
+					images.font[j] = getSubImage(files.font, 0, j * 16, 16, 16);
+				}
 			};
-		}
-
-		function loadFont() {
 		}
 
 		function init() {
