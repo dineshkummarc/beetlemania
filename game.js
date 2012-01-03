@@ -37,6 +37,19 @@
 		return degrees * (Math.PI / 180);
 	};
 
+	function getSubImage(image, x, y, width, height) {
+		var canvas, ctx;
+
+		canvas = document.createElement('canvas');
+		canvas.width = width;
+		canvas.height = height;
+
+		ctx = canvas.getContext('2d');
+		ctx.drawImage(image, -x, -y);
+
+		return canvas;
+	}
+
 	repaint = window.requestAnimationFrame ||
 		window.webkitRequestAnimationFrame ||
 		window.mozRequestAnimationFrame ||
@@ -61,6 +74,7 @@
 
 	function init() {
 		context = createCanvas(width, height, document.body);
+		game.loadImages(game.init);
 		lastUpdate = Date.now();
 		update(lastUpdate);
 	}
@@ -92,15 +106,23 @@
 			digits = [],
 			timer = [],
 			heart,
-			bg,
-			scoreImg,
-			msgImgs = [],
-			bomb,
-			font = [],
-			title,
-			space,
-			gameOver,
-			timeLeftImg,
+			images = {
+				score: null,
+				bg: null,
+				beetle: null,
+				shell: null,
+				star: null,
+				digits: null,
+				timer: null,
+				heart: null,
+				messages: null,
+				bomb: null,
+				space: null,
+				title: null,
+				gameOver: null,
+				highscores: null,
+				timeLeft: null
+			},
 			beetleBounds,
 			heartBounds,
 			bombBounds,
@@ -145,6 +167,77 @@
 			down: 40
 		};
 
+		function loadImages(callback) {
+			var files, count, postLoad;
+			files = ['bg', 'bomb', 'digits', 'font', 'gameover', 'great', 'highscores', 'hp', 'nice', 'score', 'sprites2', 'sprites', 'time', 'title'];
+			count = 0;
+
+			files.forEach(function (file) {
+				var image = new window.Image();
+				image.onload = function () {
+					files[file] = image;
+					count += 1;
+					if (count === files.length) {
+						postLoad();
+					}
+				};
+
+				image.src = 'images/' + file + '.gif';
+			});
+
+			postLoad = function () {
+				var j, sprites, sprites2, tmp;
+
+				images.score = files.score;
+				images.bg = files.bg;
+				sprites = files.sprites;
+
+				images.beetle = [];
+				for (j = 0;j < 4;j += 1) {
+					images.beetle[j] = getSubImage(sprites, j * SPRITE_WIDTH, 0, SPRITE_WIDTH, SPRITE_HEIGHT);
+				}
+
+				images.shell = [];
+				for (j = 4;j < 8;j += 1) {
+					images.shell[j - 4] = getSubImage(sprites, j * SPRITE_WIDTH, 0, SPRITE_WIDTH, SPRITE_HEIGHT);
+				}
+
+				images.star = [];
+				for (j = 8;j < 16;j += 1) {
+					images.star[j - 8] = getSubImage(sprites, j * SPRITE_WIDTH, 0, SPRITE_WIDTH, SPRITE_HEIGHT);
+				}
+
+				images.digits = [];
+				tmp = files.digits;
+				for (j = 0;j < 11;j++) {
+					images.digits[j] = getSubImage(tmp, j * 25, 0, 25, 26);
+				}
+
+				images.timer = [];
+				sprites2 = files.sprites2;
+				for (j = 0; j < 3; j++) {
+					images.timer[j] = getSubImage(sprites2, j * 24, 0, 24, 26);
+				}
+
+				images.heart = getSubImage(sprites2, timer.length*24, 2, 22, 22);
+				images.messages = [files.great, files.hp, files.nice];
+				images.bomb = files.bomb;
+				images.space = files.space;
+				images.title = files.title;
+				images.gameOver = files.gameover;
+				images.highscores = files.highscores;
+				images.timeLeft = files.time;
+
+				loadFont();
+			};
+		}
+
+		function loadFont() {
+		}
+
+		function init() {
+		}
+
 		function update(delta) {
 		}
 
@@ -180,7 +273,9 @@
 			},
 
 			render: render,
-			update: update
+			update: update,
+			init: init,
+			loadImages: loadImages
 		});
 	}());
 
