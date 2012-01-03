@@ -362,6 +362,27 @@
 			}
 		}
 
+		function drawTime(ctx, str, x, y) {
+			var n, w, j;
+
+			for (j = 0; j < str.length; j += 1) {
+				w = 0;
+
+				if (s.charAt(j) === ':') {
+					n = 10;
+					w = -5;
+				} else {
+					n = parseInt(s.charAt(j));
+					if (j < s.length - 1 && s.charAt(j + 1) === ':') {
+						w = -5;
+					}
+				}
+
+				ctx.drawImage(digits[n], x, y);
+				x += 25 + w;
+			}
+		}
+
 		function drawScore(ctx) {
 			var j, x, s = String(score);
 
