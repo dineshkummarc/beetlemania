@@ -349,7 +349,7 @@
 			return ((x >= 65 && x <= 90) || (x >= 48 && x <= 57) || typeof fontCharMap[c] === 'number');
 		}
 
-		function drawText(context, str, x, y) {
+		function drawText(ctx, str, x, y) {
 			var j, startx = 0 + x;
 			for (j = 0; j < str.length; j += 1) {
 				if (s.charAt(j) === '\n') {
@@ -357,9 +357,21 @@
 					x = 0 + startx;
 				} else {
 					x += 16;
-					context.drawImage(font[getChar(s.charAt(j))], x - 16, y);
+					ctx.drawImage(font[getChar(s.charAt(j))], x - 16, y);
 				}
 			}
+		}
+
+		function drawScore(ctx) {
+			var j, x, s = String(score);
+
+			x = WIDTH - 5;
+			for (j = s.length-1; j >= 0; j -= 1) {
+				x -= 25;
+				ctx.drawImage(digits[parseInt(s.charAt(j))], x, 5);
+			}
+
+			ctx.drawImage(images.score, x - images.score.width - 5, 5);
 		}
 
 		function update(delta) {
