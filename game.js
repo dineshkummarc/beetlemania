@@ -1,5 +1,5 @@
 (function (window, document) {
-	var width = 512, height = 448, repaint, context, lastUpdate, game, Rectangle;
+	var width = 512, height = 448, frameCount = 0, repaint, context, lastUpdate, game, Rectangle;
 
 	function createCanvas(width, height, node) {
 		var canvas = document.createElement('canvas');
@@ -82,6 +82,7 @@
 
 			game.update(delta);
 			game.render(context);
+			frameCount += 1;
 		}
 	}
 
@@ -516,9 +517,10 @@
 			}
 
 			frame+=delta;
-			fps = 'FPS: TODO';
 
 			while (frame >= 1000) {
+				fps = 'FPS: ' + frameCount;
+				frameCount = 0;
 				frame = frame - 1000;
 				if (state == STATE_GAME) {
 					if (numShells < maxShells && !squished) {
