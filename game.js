@@ -267,6 +267,37 @@
 			points[j][3] = 0; // life
 		}
 
+		function clearAllShells(scr) {
+			var inc = 0,j,n,x;
+
+			for (j = 0;j < shells.length;j++) {
+				if (shells[j][1] > 0) { // on screen
+					for (n = 0;n < NUM_STARS;n++) {
+						x = (j+1)*n;
+						stars[x][0] = shells[j][0];
+						stars[x][1] = shells[j][1];
+						stars[x][2] = rand(2,4);
+						stars[x][3] = rand(0,360);
+						stars[x][4] = scr+1;
+						stars[x][5] = rand(20,40);
+					}
+					points[j][0] = shells[j][0];
+					points[j][1] = shells[j][1];
+					points[j][2] = Math.pow(2,scr);
+					points[j][3] = 100;
+					shells[j][0] = rand(0,WIDTH); // x
+					shells[j][1] = -SPRITE_HEIGHT; // y
+					//shells[j][2] = rand(-5.0f,5.0f); // x velocity
+					shells[j][2] = 2;
+					shells[j][3] = 0.0; // y velocity
+					inc+=Math.pow(2,scr);
+				}
+			}
+			score+=inc;
+			numShells = 0;
+			maxShells = 1;
+		}
+
 		function init() {
 			var j;
 			showFPS = false;
