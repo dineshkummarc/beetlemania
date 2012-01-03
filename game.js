@@ -298,6 +298,65 @@
 			maxShells = 1;
 		}
 
+		function hitShell(n, scr) {
+			var inc, j, x, tmp;
+
+			if (maxShells < shells.length) {
+				maxShells = Math.min(maxShells+1,shells.length);
+			}
+
+			if (scr >= 0) {
+				if (scr < 13) {
+					inc = Math.pow(2,scr);
+				} else {
+					inc = 9999;
+				}
+			} else {
+				inc = 0;
+			}
+
+			score+=inc;
+			// if chain reaction is 10 shells or more, display heart
+			if (scr >= 9 && heartBounds.x == -heart.getWidth() && heartBounds.y == -heart.getHeight()) {
+				heartBounds.x = shells[n][0];
+				//heartBounds.y = (int)shells[n][1];
+				heartBounds.y = 0;
+				msg[0] = 2;
+				msg[1] = 1000;
+			}
+
+			numShells = Math.max(0,numShells-1);
+
+			// shoot off the stars
+			for (j = 0;j < NUM_STARS;j++) {
+				x = (n+1)*j;
+				stars[x][0] = shells[n][0];
+				stars[x][1] = shells[n][1];
+				stars[x][2] = rand(2,4);
+				stars[x][3] = rand(0,360);
+				stars[x][4] = scr+1;
+				stars[x][5] = rand(20,40);
+			}
+
+			
+			tmp = shells[n];
+			if (n < shells.length-1) {
+				for (x = n;x < shells.length-1;x++) {
+					shells[x] = shells[x+1];
+				}
+			}
+			points[n][0] = tmp[0];
+			points[n][1] = tmp[1];
+			points[n][2] = inc;
+			points[n][3] = 100;
+			tmp[0] = rand(0,WIDTH); // x
+			tmp[1] = -rand(SPRITE_HEIGHT,SPRITE_HEIGHT*4); // y
+			//tmp[2] = rand(-5.0f,5.0f); // x velocity
+			tmp[2] = 2;
+			tmp[3] = 0.0; // y velocity
+			shells[shells.length-1] = tmp;
+		}
+
 		function init() {
 			var j;
 			showFPS = false;
