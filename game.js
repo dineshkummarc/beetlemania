@@ -829,7 +829,7 @@
 
 			if (state == STATE_GAME) {
 				if (bombBounds.x > -images.bomb.width) {
-					ctx.drawImage(bomb, (!bombDir && bombBounds.x) || WIDTH-bombBounds.x, bombBounds.y - 59);
+					ctx.drawImage(images.bomb, (!bombDir && bombBounds.x) || WIDTH-bombBounds.x, bombBounds.y - 59);
 				}
 
 				if (blinkTime <= 0 || blinkState == 0) {
