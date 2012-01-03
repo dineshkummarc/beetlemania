@@ -233,7 +233,7 @@
 					images.timer[j] = getSubImage(files.sprites2, j * 24, 0, 24, 26);
 				}
 
-				images.heart = getSubImage(files.sprites2, timer.length * 24, 2, 22, 22);
+				images.heart = getSubImage(files.sprites2, images.timer.length * 24, 2, 22, 22);
 				images.messages = [files.great, files.hp, files.nice];
 				images.bomb = files.bomb;
 				images.space = files.space;
@@ -508,11 +508,11 @@
 			var old, inc, j, src, target, n, r;
 
 			if (blinkTime > 0) {
-				blinkTime = Math.max(blinkTime - ms, 0);
+				blinkTime = Math.max(blinkTime - delta, 0);
 			}
 
 			if (msg[1] > 0) {
-				msg[1] = Math.max(msg[1] - ms, 0);
+				msg[1] = Math.max(msg[1] - delta, 0);
 			}
 
 			frame+=delta;
