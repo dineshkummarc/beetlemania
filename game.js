@@ -39,7 +39,7 @@
 			if (typeof map === 'function') {
 				result.push(map(j));
 			} else {
-				result.push(null);
+				result.push([]);
 			}
 		}
 
@@ -189,7 +189,7 @@
 
 		function loadImages(callback) {
 			var files, count, postLoad;
-			files = ['bg', 'bomb', 'digits', 'font', 'gameover', 'great', 'highscores', 'hp', 'nice', 'score', 'sprites2', 'sprites', 'time', 'title'];
+			files = ['bg', 'bomb', 'digits', 'font', 'gameover', 'great', 'highscores', 'hp', 'nice', 'score', 'space', 'sprites2', 'sprites', 'time', 'title'];
 			count = 0;
 
 			files.forEach(function (file) {
@@ -249,6 +249,10 @@
 				for (j = 0;j < 42;j++) {
 					images.font[j] = getSubImage(files.font, 0, j * 16, 16, 16);
 				}
+
+				if (typeof callback === 'function') {
+					callback();
+				}
 			};
 		}
 
@@ -284,8 +288,8 @@
 			bombDir = 0; // direction of bomb. 0 = left, 1 = right
 			beetleFrame = 0;
 			beetleBounds = new Rectangle((WIDTH / 2) - (SPRITE_WIDTH / 2), HEIGHT - SPRITE_HEIGHT - (SPRITE_HEIGHT / 2), SPRITE_WIDTH, SPRITE_HEIGHT);
-			heartBounds = new Rectangle(-heart.width, -heart.height, heart.width, heart.height);
-			bombBounds = new Rectangle(-bomb.width, -bomb.height, 40, 40);
+			images.heartBounds = new Rectangle(-images.heart.width, -images.heart.height, images.heart.width, images.heart.height);
+			images.bombBounds = new Rectangle(-images.bomb.width, -images.bomb.height, 40, 40);
 			animFrame = 0;
 			animTime = 0;
 			blinkTime = 0;
@@ -399,8 +403,93 @@
 		}
 
 		function render(ctx) {
+			var j, w, secs, mins, str;
+
 			ctx.fillStyle = BG;
 			ctx.fillRect(0, 0, width, height);
+
+			ctx.fillStyle = '#fff';
+			for (j = scroll; j <= WIDTH; j += images.bg.width) {
+				ctx.drawImage(images.bg, j, 0);
+			}
+
+			if (state == STATE_GAME) {
+				if (bombBounds.x > -bomb.width) {
+					ctx.drawImage(bomb, (!bombDir && bombBounds.x) || WIDTH-bombBounds.x, bombBounds.y - 59);
+				}
+
+				if (blinkTime <= 0 || blinkState == 0) {
+					ctx.drawImage(beetle[beetleFrame + (squished && 2) || 0], beetleBounds.x, beetleBounds.y);
+				}
+
+				for (j = 0;j < numShells;j++) {
+					ctx.drawImage(shell[animFrame], shells[j][0], shells[j][1]);
+				}
+
+				for (j = 0;j  < bullets.length;j++) {
+					if (bullets[j][1] > -SPRITE_HEIGHT) {
+						ctx.drawImage(star[animFrame], bullets[j][0], bullets[j][1]);
+					}
+				}
+
+				for (j = 0;j < stars.length;j++) {
+					if (stars[j][5] > 0.0) {
+						ctx.drawImage(star[4 + animFrame], stars[j][0], stars[j][1]);
+					}
+				}
+
+				secs = timeLeft / 1000;
+				mins = secs / 60;
+				secs %= 60;
+				ctx.drawImage(images.timeLeft, 5, 5);
+				drawTime(ctx, String(mins) + ':' + (secs < 10 && '0' + String(secs)) || String(secs), images.timeLeft.width + 10, 5);
+
+				for (j = 0;j < points.length;j++) {
+					if (points[j][3] > 0) {
+						drawText(ctx, String(points[j][2]), points[j][0], points[j][1]);
+					}
+				}
+
+				drawScore(ctx);
+
+				if (squished) {
+					if (MAX_SQUISH_TIME - squishTime <= 3000 && MAX_SQUISH_TIME - squishTime > 0) {
+						j = 2;
+						if (MAX_SQUISH_TIME - squishTime <= 2000) {
+							j = 1;
+						}
+						if (MAX_SQUISH_TIME - squishTime <= 1000) {
+							j = 0;
+						}
+
+						ctx.drawImage(images.timer[j], beetleBounds.x, beetleBounds.y - beetleBounds.height - 12);
+					}
+				}
+
+				ctx.drawImage(images.heart, heartBounds.x, heartBounds.y);
+
+				// big message on screen ("nice!" / "great!" / "hp + 1")
+				if (msg[1] > 0) {
+					ctx.drawImage(
+						images.messages[msg[0]],
+						(WIDTH / 2) - (images.messages[msg[0]].width / 2),
+						(HEIGHT / 2) - (images.messages[msg[0]].height / 2)
+					);
+				}
+			} else if (state == STATE_TITLE) {
+				ctx.drawImage(images.title, (WIDTH / 2) - (images.title.width / 2), 10);
+				if (animFrame === 0 || animFrame === 1) {
+					ctx.drawImage(images.space, (WIDTH / 2) - (images.space.width / 2), HEIGHT - images.space.height - 10);
+				}
+			} else if (state == STATE_GAME_OVER) {
+				ctx.drawImage(images.gameOver, (WIDTH / 2) - (gameOver.width / 2), 10);
+				drawText(ctx, 'Your Score: ' + score + '\n\n-Press -ENTER- to submit score\n\n-Press -R- to restart game', 10, 150);
+				ctx.drawImage(beetle[(squished && 2 || 0)], beetleBounds.x, beetleBounds.y);
+			}
+
+			if (showFPS) {
+				drawText(ctx, fps, 5, HEIGHT - 16 - 5);
+			}
 		}
 
 		return ({
