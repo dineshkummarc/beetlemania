@@ -1,5 +1,5 @@
 (function (window, document) {
-	var width = 512, height = 448, repaint, context, lastUpdate, game;
+	var width = 512, height = 448, repaint, context, lastUpdate, game, Rectangle;
 
 	function createCanvas(width, height, node) {
 		var canvas = document.createElement('canvas');
@@ -115,6 +115,53 @@
 			update: update
 		});
 	}());
+
+	Rectangle = function (x, y, width, height) {
+		if (x.constructor && x.constructor === Rectangle) {
+			this.x = x.x;
+			this.y = x.y;
+			this.width = x.width;
+			this.height = x.height;
+		} else {
+			this.x = +x || 0;
+			this.y = +y || 0;
+			this.width = +width || 1;
+			this.height = +height || 1;
+		}
+	};
+
+	Rectangle.prototype.contains = function (x, y) {
+		return (
+			(x >= this.x && x <= this.x + this.width) &&
+			(y >= this.y && y <= this.y + this.height)
+		);
+	};
+
+	/* modified from the java.awt.Rectangle source code */
+	Rectangle.prototype.intersects = function (rect) {
+		var tw, th, rw, rh, tx, ty, rx, ry;
+
+		tw = this.width;
+		th = this.height;
+		rw = r.width;
+		rh = r.height;
+		if (rw <= 0 || rh <= 0 || tw <= 0 || th <= 0) {
+			return false;
+		}
+		tx = this.x;
+		ty = this.y;
+		rx = r.x;
+		ry = r.y;
+		rw += rx;
+		rh += ry;
+		tw += tx;
+		th += ty;
+		//      overflow || intersect
+		return ((rw < rx || rw > tx) &&
+			(rh < ry || rh > ty) &&
+			(tw < tx || tw > rx) &&
+			(th < ty || th > ry));
+	};
 
 	init();
 }(this, this.document));
