@@ -224,10 +224,7 @@
 					images.star[j - 8] = getSubImage(files.sprites, j * SPRITE_WIDTH, 0, SPRITE_WIDTH, SPRITE_HEIGHT);
 				}
 
-				images.digits = [];
-				for (j = 0;j < 11;j += 1) {
-					images.digits[j] = getSubImage(files.digits, j * 25, 0, 25, 26);
-				}
+				images.digits = files.digits;
 
 				images.timer = [];
 				for (j = 0; j < 3; j += 1) {
@@ -472,6 +469,10 @@
 			}
 		}
 
+		function drawDigit(ctx, n, x, y) {
+			ctx.drawImage(images.digits, n * 25, 0, 25, 26, x, y, 25, 26); 
+		}
+
 		function drawTime(ctx, str, x, y) {
 			var n, w, j;
 
@@ -488,7 +489,7 @@
 					}
 				}
 
-				ctx.drawImage(images.digits[n], x, y);
+				drawDigit(ctx, n, x, y);
 				x += 25 + w;
 			}
 		}
@@ -499,7 +500,7 @@
 			x = WIDTH - 5;
 			for (j = s.length-1; j >= 0; j -= 1) {
 				x -= 25;
-				ctx.drawImage(images.digits[parseInt(s.charAt(j))], x, 5);
+				drawDigit(ctx, parseInt(s.charAt(j)), x, 5);
 			}
 
 			ctx.drawImage(images.score, x - images.score.width - 5, 5);
