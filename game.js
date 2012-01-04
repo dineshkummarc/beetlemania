@@ -674,70 +674,66 @@
 				src = new Rectangle(0,0,SPRITE_WIDTH,SPRITE_HEIGHT);
 				target = new Rectangle(0,0,SPRITE_WIDTH,SPRITE_HEIGHT);
 				for (n = 0;n < numShells;n += 1) {
-					if (shells[n].y < 0) {
-						continue;
-					}
-
-					// collision with bullets
-					for (j = 0;j < bullets.length;j += 1) {
-						if (bullets[j].y < 0) {
-							continue;
-						}
-						src.x = bullets[j].x;
-						src.y = bullets[j].y;
-						target.x = shells[n].x;
-						target.y = shells[n].y;
-						if (src.intersects(target)) { // collision
-							bullets[j].y = -SPRITE_HEIGHT; // bullet disappears
-							hitShell(n,0);
-							break;
-						}
-					}
-
-					// collision with red stars
-					for (j = 0;j < stars.length;j += 1) {
-						if (stars[j].y >= 0.0 && stars[j].timeToLive > 0.0) {
-							src.x = stars[j].x;
-							src.y = stars[j].y;
-							target.x = shells[n].x;
-							target.y = shells[n].y;
-							if (target.y >= 0 && src.intersects(target)) { // collision
-								stars[j].timeToLive = 0.0;
-								hitShell(n,stars[j].scoreAmount);
-								break;
+					if (shells[n].y >= 0) {
+						// collision with bullets
+						for (j = 0;j < bullets.length;j += 1) {
+							if (bullets[j].y >= 0) {
+								src.x = bullets[j].x;
+								src.y = bullets[j].y;
+								target.x = shells[n].x;
+								target.y = shells[n].y;
+								if (src.intersects(target)) { // collision
+									bullets[j].y = -SPRITE_HEIGHT; // bullet disappears
+									hitShell(n,0);
+									break;
+								}
 							}
 						}
-					}
-					target.x = shells[n].x;
-					target.y = shells[n].y;
 
-					// collision with beetle
-					if (!squished && blinkTime <= 0 && target.intersects(beetleBounds)) { // collision
-						squished = true;
-						squishTime = 0;
-						pressMax+=3;
-						pressCount = 0;
+						// collision with red stars
+						for (j = 0;j < stars.length;j += 1) {
+							if (stars[j].y >= 0.0 && stars[j].timeToLive > 0.0) {
+								src.x = stars[j].x;
+								src.y = stars[j].y;
+								target.x = shells[n].x;
+								target.y = shells[n].y;
+								if (target.y >= 0 && src.intersects(target)) { // collision
+									stars[j].timeToLive = 0.0;
+									hitShell(n,stars[j].scoreAmount);
+									break;
+								}
+							}
+						}
+						target.x = shells[n].x;
+						target.y = shells[n].y;
+
+						// collision with beetle
+						if (!squished && blinkTime <= 0 && target.intersects(beetleBounds)) { // collision
+							squished = true;
+							squishTime = 0;
+							pressMax+=3;
+							pressCount = 0;
+						}
 					}
 				}
 
 				// bullet collision with bomb
 				for (j = 0;j < bullets.length;j += 1) {
-					if (bullets[j].y < 0) {
-						continue;
-					}
-					src.x = bullets[j].x;
-					src.y = bullets[j].y;
-					r = new Rectangle(bombBounds);
-					if (bombDir !== 0) {
-						r.x = WIDTH-bombBounds.x;
-					}
-					if (src.intersects(r)) {
-						bullets[j].y = -SPRITE_HEIGHT; // bullet disappears
-						clearAllShells(9);
-						bombScore = score+500;
-						msg[0] = 0;
-						msg[1] = 1000;
-						bombBounds.x = -images.bomb.width;
+					if (bullets[j].y >= 0) {
+						src.x = bullets[j].x;
+						src.y = bullets[j].y;
+						r = new Rectangle(bombBounds);
+						if (bombDir !== 0) {
+							r.x = WIDTH-bombBounds.x;
+						}
+						if (src.intersects(r)) {
+							bullets[j].y = -SPRITE_HEIGHT; // bullet disappears
+							clearAllShells(9);
+							bombScore = score+500;
+							msg[0] = 0;
+							msg[1] = 1000;
+							bombBounds.x = -images.bomb.width;
+						}
 					}
 				}
 
