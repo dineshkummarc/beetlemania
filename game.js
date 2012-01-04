@@ -609,7 +609,7 @@
 							break;
 						}
 					}
-					keys[keys.spacebar] = -2;
+					keys[keys.spacebar] = -1;
 				}
 
 				// bullet movement
