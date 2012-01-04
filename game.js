@@ -365,7 +365,7 @@
 		function init() {
 			var j;
 			showFPS = false;
-			bullets = createArray(10);
+			bullets = createArray(10, function () { return {}; });
 			shells = createArray(35);
 			points = createArray(shells.length); // points is the score increase displayed on the screen
 
@@ -431,8 +431,8 @@
 			}
 
 			for (j = 0;j < bullets.length;j++) {
-				bullets[j][0] = 0; // x
-				bullets[j][1] = -SPRITE_HEIGHT; // y
+				bullets[j].x = 0; // x
+				bullets[j].y = -SPRITE_HEIGHT; // y
 			}
 
 			timeLeft = GAME_DURATION;
@@ -603,9 +603,9 @@
 				// bullet firing
 				if (!squished && isKeyDown(keys.spacebar)) {
 					for (j = 0;j < bullets.length;j++) {
-						if (bullets[j][1] <= -SPRITE_HEIGHT) {
-							bullets[j][0] = beetleBounds.x;
-							bullets[j][1] = beetleBounds.y-(SPRITE_HEIGHT>>1);
+						if (bullets[j].y <= -SPRITE_HEIGHT) {
+							bullets[j].x = beetleBounds.x;
+							bullets[j].y = beetleBounds.y-(SPRITE_HEIGHT>>1);
 							break;
 						}
 					}
@@ -614,8 +614,8 @@
 
 				// bullet movement
 				for (j = 0;j < bullets.length;j++) {
-					if (bullets[j][1] > -SPRITE_HEIGHT) {
-						bullets[j][1]-=5;
+					if (bullets[j].y > -SPRITE_HEIGHT) {
+						bullets[j].y-=5;
 					}
 				}
 
@@ -677,15 +677,15 @@
 
 					// collision with bullets
 					for (j = 0;j < bullets.length;j++) {
-						if (bullets[j][1] < 0) {
+						if (bullets[j].y < 0) {
 							continue;
 						}
-						src.x = bullets[j][0];
-						src.y = bullets[j][1];
+						src.x = bullets[j].x;
+						src.y = bullets[j].y;
 						target.x = shells[n][0];
 						target.y = shells[n][1];
 						if (src.intersects(target)) { // collision
-							bullets[j][1] = -SPRITE_HEIGHT; // bullet disappears
+							bullets[j].y = -SPRITE_HEIGHT; // bullet disappears
 							hitShell(n,0);
 							break;
 						}
@@ -719,15 +719,15 @@
 
 				// bullet collision with bomb
 				for (j = 0;j < bullets.length;j++) {
-					if (bullets[j][1] < 0) {
+					if (bullets[j].y < 0) {
 						continue;
 					}
-					src.x = bullets[j][0];
-					src.y = bullets[j][1];
+					src.x = bullets[j].x;
+					src.y = bullets[j].y;
 					r = new Rectangle(bombBounds);
 					if (bombDir != 0) r.x = WIDTH-bombBounds.x;
 					if (src.intersects(r)) {
-						bullets[j][1] = -SPRITE_HEIGHT; // bullet disappears
+						bullets[j].y = -SPRITE_HEIGHT; // bullet disappears
 						clearAllShells(9);
 						bombScore = score+500;
 						msg[0] = 0;
@@ -841,8 +841,8 @@
 				}
 
 				for (j = 0;j  < bullets.length;j++) {
-					if (bullets[j][1] > -SPRITE_HEIGHT) {
-						ctx.drawImage(images.star[animFrame], bullets[j][0], bullets[j][1]);
+					if (bullets[j].y > -SPRITE_HEIGHT) {
+						ctx.drawImage(images.star[animFrame], bullets[j].x, bullets[j].y);
 					}
 				}
 
