@@ -262,10 +262,10 @@
 			shells[j].y = -SPRITE_HEIGHT; // y
 			shells[j].vx = 2.0;
 			shells[j].vy = 0.0; // y velocity
-			points[j][0] = 0; // x
-			points[j][1] = 0; // y
-			points[j][2] = 0; // score
-			points[j][3] = 0; // life
+			points[j].x = 0; // x
+			points[j].y = 0; // y
+			points[j].score = 0; // score
+			points[j].life = 0; // life
 		}
 
 		function clearAllShells(scr) {
@@ -282,10 +282,10 @@
 						stars[x][4] = scr+1;
 						stars[x][5] = rand(20,40);
 					}
-					points[j][0] = shells[j].x;
-					points[j][1] = shells[j].y;
-					points[j][2] = Math.pow(2,scr);
-					points[j][3] = 100;
+					points[j].x = shells[j].x;
+					points[j].y = shells[j].y;
+					points[j].score = Math.pow(2,scr);
+					points[j].life = 100;
 					shells[j].x = rand(0,WIDTH); // x
 					shells[j].y = -SPRITE_HEIGHT; // y
 					//shells[j].vx = rand(-5.0,5.0); // x velocity
@@ -346,10 +346,10 @@
 					shells[x] = shells[x+1];
 				}
 			}
-			points[n][0] = tmp.x;
-			points[n][1] = tmp.y;
-			points[n][2] = inc;
-			points[n][3] = 100;
+			points[n].x = tmp.x;
+			points[n].y = tmp.y;
+			points[n].score = inc;
+			points[n].life = 100;
 			tmp.x = rand(0,WIDTH); // x
 			tmp.y = -rand(SPRITE_HEIGHT,SPRITE_HEIGHT*4); // y
 			//tmp.vx = rand(-5.0,5.0); // x velocity
@@ -415,10 +415,10 @@
 				shells[j].vx = 2.0;
 				shells[j].vy = 0.0; // y velocity
 
-				points[j][0] = 0; // x
-				points[j][1] = 0; // y
-				points[j][2] = 0; // score
-				points[j][3] = 0; // life
+				points[j].x = 0; // x
+				points[j].y = 0; // y
+				points[j].score = 0; // score
+				points[j].life = 0; // life
 			}
 
 			for (j = 0;j < stars.length;j++) {
@@ -661,9 +661,9 @@
 
 				// points movement
 				for (j = 0;j < points.length;j++) {
-					if (points[j][3] > 0) {
-						points[j][1]--;
-						points[j][3]--;
+					if (points[j].life > 0) {
+						points[j].y--;
+						points[j].life--;
 					}
 				}
 
@@ -859,8 +859,8 @@
 				drawTime(ctx, String(mins) + ':' + ((secs < 10 && '0' + String(secs)) || String(secs)), images.timeLeft.width + 10, 5);
 
 				for (j = 0;j < points.length;j++) {
-					if (points[j][3] > 0) {
-						drawText(ctx, String(points[j][2]), points[j][0], points[j][1]);
+					if (points[j].life > 0) {
+						drawText(ctx, String(points[j].score), points[j].x, points[j].y);
 					}
 				}
 
