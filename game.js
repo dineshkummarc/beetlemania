@@ -39,7 +39,7 @@
 			if (typeof map === 'function') {
 				result.push(map(j));
 			} else {
-				result.push([]);
+				result.push({});
 			}
 		}
 
@@ -275,12 +275,12 @@
 				if (shells[j].y > 0) { // on screen
 					for (n = 0;n < NUM_STARS;n++) {
 						x = (j+1)*n;
-						stars[x][0] = shells[j].x;
-						stars[x][1] = shells[j].y;
-						stars[x][2] = rand(2,4);
-						stars[x][3] = rand(0,360);
-						stars[x][4] = scr+1;
-						stars[x][5] = rand(20,40);
+						stars[x].x = shells[j].x;
+						stars[x].y = shells[j].y;
+						stars[x].velocity = rand(2,4);
+						stars[x].angle = rand(0,360);
+						stars[x].scoreAmount = scr+1;
+						stars[x].timeToLive = rand(20,40);
 					}
 					points[j].x = shells[j].x;
 					points[j].y = shells[j].y;
@@ -331,12 +331,12 @@
 			// shoot off the stars
 			for (j = 0;j < NUM_STARS;j++) {
 				x = (n+1)*j;
-				stars[x][0] = shells[n].x;
-				stars[x][1] = shells[n].y;
-				stars[x][2] = rand(2,4);
-				stars[x][3] = rand(0,360);
-				stars[x][4] = scr+1;
-				stars[x][5] = rand(20,40);
+				stars[x].x = shells[n].x;
+				stars[x].y = shells[n].y;
+				stars[x].velocity = rand(2,4);
+				stars[x].angle = rand(0,360);
+				stars[x].scoreAmount = scr+1;
+				stars[x].timeToLive = rand(20,40);
 			}
 
 			
@@ -365,7 +365,7 @@
 		function init() {
 			var j;
 			showFPS = false;
-			bullets = createArray(10, function () { return {}; });
+			bullets = createArray(10);
 			shells = createArray(35);
 			points = createArray(shells.length); // points is the score increase displayed on the screen
 
@@ -422,12 +422,12 @@
 			}
 
 			for (j = 0;j < stars.length;j++) {
-				stars[j][0] = rand(0, WIDTH); // x
-				stars[j][1] = 100.0; // y
-				stars[j][2] = 10; // velocity
-				stars[j][3] = rand(0, 360); // degree of movement
-				stars[j][4] = 1.0; // score amount (2^stars[j][4])
-				stars[j][5] = 0.0; // time to live
+				stars[j].x = rand(0, WIDTH); // x
+				stars[j].y = 100.0; // y
+				stars[j].velocity = 10; // velocity
+				stars[j].angle = rand(0, 360); // degree of movement
+				stars[j].scoreAmount = 1.0; // score amount (2^stars[j].scoreAmount)
+				stars[j].timeToLive = 0.0; // time to live
 			}
 
 			for (j = 0;j < bullets.length;j++) {
@@ -652,10 +652,10 @@
 
 				// stars movement
 				for (j = 0;j < stars.length;j++) {
-					if (stars[j][5] > 0.0) {
-						stars[j][0]+=Math.cos(Math.toRadians(stars[j][3]))*stars[j][2];
-						stars[j][1]+=Math.sin(Math.toRadians(stars[j][3]))*stars[j][2];
-						stars[j][5]-=1.0;
+					if (stars[j].timeToLive > 0.0) {
+						stars[j].x+=Math.cos(Math.toRadians(stars[j].angle))*stars[j].velocity;
+						stars[j].y+=Math.sin(Math.toRadians(stars[j].angle))*stars[j].velocity;
+						stars[j].timeToLive-=1.0;
 					}
 				}
 
@@ -693,14 +693,14 @@
 
 					// collision with red stars
 					for (j = 0;j < stars.length;j++) {
-						if (stars[j][1] >= 0.0 && stars[j][5] > 0.0) {
-							src.x = stars[j][0];
-							src.y = stars[j][1];
+						if (stars[j].y >= 0.0 && stars[j].timeToLive > 0.0) {
+							src.x = stars[j].x;
+							src.y = stars[j].y;
 							target.x = shells[n].x;
 							target.y = shells[n].y;
 							if (target.y >= 0 && src.intersects(target)) { // collision
-								stars[j][5] = 0.0;
-								hitShell(n,stars[j][4]);
+								stars[j].timeToLive = 0.0;
+								hitShell(n,stars[j].scoreAmount);
 								break;
 							}
 						}
@@ -847,8 +847,8 @@
 				}
 
 				for (j = 0;j < stars.length;j++) {
-					if (stars[j][5] > 0.0) {
-						ctx.drawImage(images.star[4 + animFrame], stars[j][0], stars[j][1]);
+					if (stars[j].timeToLive > 0.0) {
+						ctx.drawImage(images.star[4 + animFrame], stars[j].x, stars[j].y);
 					}
 				}
 
