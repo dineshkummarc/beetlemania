@@ -132,7 +132,6 @@
 				score: null,
 				bg: null,
 				beetle: null,
-				shell: null,
 				star: null,
 				digits: null,
 				timer: null,
@@ -214,23 +213,17 @@
 					images.beetle[j] = getSubImage(files.sprites, j * SPRITE_WIDTH, 0, SPRITE_WIDTH, SPRITE_HEIGHT);
 				}
 
-				images.shell = [];
-				for (j = 4;j < 8;j += 1) {
-					images.shell[j - 4] = getSubImage(files.sprites, j * SPRITE_WIDTH, 0, SPRITE_WIDTH, SPRITE_HEIGHT);
-				}
-
 				images.star = [];
 				for (j = 8;j < 16;j += 1) {
 					images.star[j - 8] = getSubImage(files.sprites, j * SPRITE_WIDTH, 0, SPRITE_WIDTH, SPRITE_HEIGHT);
 				}
-
-				images.digits = files.digits;
 
 				images.timer = [];
 				for (j = 0; j < 3; j += 1) {
 					images.timer[j] = getSubImage(files.sprites2, j * 24, 0, 24, 26);
 				}
 
+				images.sprites = files.sprites;
 				images.heart = getSubImage(files.sprites2, images.timer.length * 24, 2, 22, 22);
 				images.messages = [files.great, files.hp, files.nice];
 				images.bomb = files.bomb;
@@ -241,8 +234,7 @@
 				images.timeLeft = files.time;
 				images.score = files.score;
 				images.bg = files.bg;
-
-
+				images.digits = files.digits;
 				images.font = files.font;
 
 				if (typeof callback === 'function') {
@@ -256,6 +248,7 @@
 			shells[j].y = -SPRITE_HEIGHT; // y
 			shells[j].vx = 2.0;
 			shells[j].vy = 0.0; // y velocity
+
 			points[j].x = 0; // x
 			points[j].y = 0; // y
 			points[j].score = 0; // score
@@ -468,6 +461,15 @@
 
 		function drawDigit(ctx, n, x, y) {
 			ctx.drawImage(images.digits, n * 25, 0, 25, 26, x, y, 25, 26); 
+		}
+
+		function drawShell(ctx, x, y, animFrame) {
+			ctx.drawImage(
+				images.sprites,
+				(4 * SPRITE_WIDTH) + animFrame * SPRITE_WIDTH, 0,
+				SPRITE_WIDTH, SPRITE_HEIGHT,
+				x, y, SPRITE_WIDTH, SPRITE_HEIGHT
+			);
 		}
 
 		function drawTime(ctx, str, x, y) {
@@ -835,7 +837,7 @@
 				}
 
 				for (j = 0;j < numShells;j++) {
-					ctx.drawImage(images.shell[animFrame], shells[j].x, shells[j].y);
+					drawShell(ctx, shells[j].x, shells[j].y, animFrame);
 				}
 
 				for (j = 0;j  < bullets.length;j++) {
