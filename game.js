@@ -243,10 +243,7 @@
 				images.bg = files.bg;
 
 
-				images.font = [];
-				for (j = 0;j < 42;j++) {
-					images.font[j] = getSubImage(files.font, 0, j * 16, 16, 16);
-				}
+				images.font = files.font;
 
 				if (typeof callback === 'function') {
 					callback();
@@ -464,7 +461,7 @@
 					x = 0 + startx;
 				} else {
 					x += 16;
-					ctx.drawImage(images.font[getChar(str.charAt(j))], x - 16, y);
+					ctx.drawImage(images.font, 0, getChar(str.charAt(j)) * 16, 16, 16, x - 16, y, 16, 16); 
 				}
 			}
 		}
