@@ -1,4 +1,5 @@
 (function (window, document) {
+	"use strict";
 	var width = 512, height = 448, frameCount = 0, repaint, context, lastUpdate, game, Rectangle;
 
 	function createCanvas(width, height, node) {
@@ -108,7 +109,7 @@
 			STATE_TITLE = 0,
 			STATE_GAME = 1,
 			STATE_GAME_OVER = 2,
-			GAME_DURATION = 3*60*1000,
+			GAME_DURATION = 3 * 60 * 1000,
 			state, // game state
 			fontCharMap = {
 				'_': 36,
@@ -199,7 +200,7 @@
 				var j;
 
 				images.beetle = [];
-				for (j = 0;j < 4;j += 1) {
+				for (j = 0; j < 4; j += 1) {
 					images.beetle[j] = getSubImage(files.sprites, j * SPRITE_WIDTH, 0, SPRITE_WIDTH, SPRITE_HEIGHT);
 				}
 
@@ -229,32 +230,32 @@
 		}
 
 		function clearAllShells(scr) {
-			var inc = 0,j,n,x;
+			var inc = 0, j, n, x;
 
-			for (j = 0;j < shells.length;j += 1) {
+			for (j = 0; j < shells.length; j += 1) {
 				if (shells[j].y > 0) { // on screen
-					for (n = 0;n < NUM_STARS;n += 1) {
-						x = (j+1)*n;
+					for (n = 0; n < NUM_STARS; n += 1) {
+						x = (j + 1) * n;
 						stars[x].x = shells[j].x;
 						stars[x].y = shells[j].y;
-						stars[x].velocity = rand(2,4);
-						stars[x].angle = rand(0,360);
-						stars[x].scoreAmount = scr+1;
-						stars[x].timeToLive = rand(20,40);
+						stars[x].velocity = rand(2, 4);
+						stars[x].angle = rand(0, 360);
+						stars[x].scoreAmount = scr + 1;
+						stars[x].timeToLive = rand(20, 40);
 					}
 					points[j].x = shells[j].x;
 					points[j].y = shells[j].y;
-					points[j].score = Math.pow(2,scr);
+					points[j].score = Math.pow(2, scr);
 					points[j].life = 100;
-					shells[j].x = rand(0,WIDTH); // x
+					shells[j].x = rand(0, WIDTH); // x
 					shells[j].y = -SPRITE_HEIGHT; // y
-					//shells[j].vx = rand(-5.0,5.0); // x velocity
+					//shells[j].vx = rand(-5.0, 5.0); // x velocity
 					shells[j].vx = 2;
 					shells[j].vy = 0.0; // y velocity
-					inc+=Math.pow(2,scr);
+					inc += Math.pow(2, scr);
 				}
 			}
-			score+=inc;
+			score += inc;
 			numShells = 0;
 			maxShells = 1;
 		}
@@ -263,12 +264,12 @@
 			var inc, j, x, tmp;
 
 			if (maxShells < shells.length) {
-				maxShells = Math.min(maxShells+1,shells.length);
+				maxShells = Math.min(maxShells + 1, shells.length);
 			}
 
 			if (scr >= 0) {
 				if (scr < 13) {
-					inc = Math.pow(2,scr);
+					inc = Math.pow(2, scr);
 				} else {
 					inc = 9999;
 				}
@@ -276,7 +277,7 @@
 				inc = 0;
 			}
 
-			score+=inc;
+			score += inc;
 			// if chain reaction is 10 shells or more, display heart
 			if (scr >= 9 && heartBounds.x === -images.heart.width && heartBounds.y === -images.heart.height) {
 				heartBounds.x = shells[n].x;
@@ -286,36 +287,35 @@
 				msg[1] = 1000;
 			}
 
-			numShells = Math.max(0,numShells-1);
+			numShells = Math.max(0, numShells - 1);
 
 			// shoot off the stars
-			for (j = 0;j < NUM_STARS;j += 1) {
-				x = (n+1)*j;
+			for (j = 0; j < NUM_STARS; j += 1) {
+				x = (n + 1) * j;
 				stars[x].x = shells[n].x;
 				stars[x].y = shells[n].y;
-				stars[x].velocity = rand(2,4);
-				stars[x].angle = rand(0,360);
-				stars[x].scoreAmount = scr+1;
-				stars[x].timeToLive = rand(20,40);
+				stars[x].velocity = rand(2, 4);
+				stars[x].angle = rand(0, 360);
+				stars[x].scoreAmount = scr + 1;
+				stars[x].timeToLive = rand(20, 40);
 			}
 
-			
 			tmp = shells[n];
-			if (n < shells.length-1) {
-				for (x = n;x < shells.length-1;x += 1) {
-					shells[x] = shells[x+1];
+			if (n < shells.length - 1) {
+				for (x = n; x < shells.length - 1; x += 1) {
+					shells[x] = shells[x + 1];
 				}
 			}
 			points[n].x = tmp.x;
 			points[n].y = tmp.y;
 			points[n].score = inc;
 			points[n].life = 100;
-			tmp.x = rand(0,WIDTH); // x
-			tmp.y = -rand(SPRITE_HEIGHT,SPRITE_HEIGHT*4); // y
-			//tmp.vx = rand(-5.0,5.0); // x velocity
+			tmp.x = rand(0, WIDTH); // x
+			tmp.y = -rand(SPRITE_HEIGHT, SPRITE_HEIGHT * 4); // y
+			//tmp.vx = rand(-5.0, 5.0); // x velocity
 			tmp.vx = 2;
 			tmp.vy = 0.0; // y velocity
-			shells[shells.length-1] = tmp;
+			shells[shells.length - 1] = tmp;
 		}
 
 		function isKeyDown(code) {
@@ -348,7 +348,7 @@
 			fps = 'FPS: 0';
 			input = '';
 
-			for (j = 0;j < shells.length;j += 1) {
+			for (j = 0; j < shells.length; j += 1) {
 				shells[j].x = rand(0, WIDTH); // x
 				shells[j].y = -SPRITE_HEIGHT; // y
 				shells[j].vx = 2.0;
@@ -360,7 +360,7 @@
 				points[j].life = 0; // life
 			}
 
-			for (j = 0;j < stars.length;j += 1) {
+			for (j = 0; j < stars.length; j += 1) {
 				stars[j].x = rand(0, WIDTH); // x
 				stars[j].y = 100.0; // y
 				stars[j].velocity = 10; // velocity
@@ -369,7 +369,7 @@
 				stars[j].timeToLive = 0.0; // time to live
 			}
 
-			for (j = 0;j < bullets.length;j += 1) {
+			for (j = 0; j < bullets.length; j += 1) {
 				bullets[j].x = 0; // x
 				bullets[j].y = -SPRITE_HEIGHT; // y
 			}
@@ -398,15 +398,13 @@
 			reset();
 		}
 
-
-		function getChar(chr) { 
+		function getChar(chr) {
 			var x = chr.toUpperCase().charCodeAt(0);
 
 			if (x >= 65 && x <= 90) { // A-Z
-				return x-65;
-			}
-			else if (x >= 48 && x <= 57) { // 0-9
-				return 26+x-48;
+				return x - 65;
+			} else if (x >= 48 && x <= 57) { // 0-9
+				return 26 + x - 48;
 			} else if (typeof fontCharMap[chr] === 'number') {
 				return fontCharMap[chr];
 			}
@@ -422,20 +420,17 @@
 					x = startx;
 				} else {
 					x += 16;
-					ctx.drawImage(images.font, 0, getChar(str.charAt(j)) * 16, 16, 16, x - 16, y, 16, 16); 
+					ctx.drawImage(images.font, 0, getChar(str.charAt(j)) * 16, 16, 16, x - 16, y, 16, 16);
 				}
 			}
 		}
 
 		function drawDigit(ctx, n, x, y) {
-			ctx.drawImage(images.digits, n * 25, 0, 25, 26, x, y, 25, 26); 
+			ctx.drawImage(images.digits, n * 25, 0, 25, 26, x, y, 25, 26);
 		}
 
 		function drawSprite(ctx, x, y, offset) {
-			ctx.drawImage(images.sprites,
-				offset, 0, SPRITE_WIDTH, SPRITE_HEIGHT,
-				x, y, SPRITE_WIDTH, SPRITE_HEIGHT
-			);
+			ctx.drawImage(images.sprites, offset, 0, SPRITE_WIDTH, SPRITE_HEIGHT, x, y, SPRITE_WIDTH, SPRITE_HEIGHT);
 		}
 
 		function drawShell(ctx, x, y, animFrame) {
@@ -471,7 +466,7 @@
 			var j, x, s = String(score);
 
 			x = WIDTH - 5;
-			for (j = s.length-1; j >= 0; j -= 1) {
+			for (j = s.length - 1; j >= 0; j -= 1) {
 				x -= 25;
 				drawDigit(ctx, parseInt(s.charAt(j), 10), x, 5);
 			}
@@ -490,7 +485,7 @@
 				msg[1] = Math.max(msg[1] - delta, 0);
 			}
 
-			frame+=delta;
+			frame += delta;
 
 			while (frame >= 1000) {
 				fps = 'FPS: ' + frameCount;
@@ -499,17 +494,17 @@
 				if (state === STATE_GAME) {
 					if (numShells < maxShells && !squished) {
 						old = numShells;
-						numShells = Math.min(numShells+rand(3,7),maxShells);
+						numShells = Math.min(numShells + rand(3, 7), maxShells);
 						inc = 2;
 						while (old < numShells) {
 							shells[old].y -= SPRITE_HEIGHT * inc;
-							inc*=2;
+							inc *= 2;
 							old += 1;
 						}
 					}
-					if (score >= bombScore && bombBounds.x <= -images.bomb.width && rand(0,100) <= 2) {
-						bombBounds.x = WIDTH+images.bomb.width;
-						bombBounds.y = rand(58,HEIGHT / 4);
+					if (score >= bombScore && bombBounds.x <= -images.bomb.width && rand(0, 100) <= 2) {
+						bombBounds.x = WIDTH + images.bomb.width;
+						bombBounds.y = rand(58, HEIGHT / 4);
 						bombDir = 1;
 						if (beetleBounds.x + (beetleBounds.width / 2) >= (WIDTH / 2)) {
 							bombDir = 0;
@@ -525,7 +520,7 @@
 					scroll = 0;
 				}
 
-				bgTime-=25;
+				bgTime -= 25;
 
 				if (blinkTime > 0) {
 					blinkState = (!blinkState && 1) || 0;
@@ -553,34 +548,34 @@
 				// beetle movement
 				if (!squished) {
 					if (isKeyDown(keys.left)) {
-						beetleBounds.x-=2;
+						beetleBounds.x -= 2;
 					}
 					if (isKeyDown(keys.right)) {
-						beetleBounds.x+=2;
+						beetleBounds.x += 2;
 					}
 
 					if (beetleBounds.x < 0) {
 						beetleBounds.x = 0;
 					}
-					if (beetleBounds.x > WIDTH-SPRITE_WIDTH) {
-						beetleBounds.x = WIDTH-SPRITE_WIDTH;
+					if (beetleBounds.x > WIDTH - SPRITE_WIDTH) {
+						beetleBounds.x = WIDTH - SPRITE_WIDTH;
 					}
 				}
-				
+
 				// bomb/lakitu movement
 				if (bombBounds.x > -images.bomb.width) {
-					bombBounds.x-=3;
+					bombBounds.x -= 3;
 					if (bombBounds.x <= -images.bomb.width) {
-						bombScore = score+500;
+						bombScore = score + 500;
 					}
 				}
 
 				// bullet firing
 				if (!squished && isKeyDown(keys.spacebar)) {
-					for (j = 0;j < bullets.length;j += 1) {
+					for (j = 0; j < bullets.length; j += 1) {
 						if (bullets[j].y <= -SPRITE_HEIGHT) {
 							bullets[j].x = beetleBounds.x;
-							bullets[j].y = beetleBounds.y-(SPRITE_HEIGHT / 2);
+							bullets[j].y = beetleBounds.y - (SPRITE_HEIGHT / 2);
 							break;
 						}
 					}
@@ -588,54 +583,54 @@
 				}
 
 				// bullet movement
-				for (j = 0;j < bullets.length;j += 1) {
+				for (j = 0; j < bullets.length; j += 1) {
 					if (bullets[j].y > -SPRITE_HEIGHT) {
-						bullets[j].y-=5;
+						bullets[j].y -= 5;
 					}
 				}
 
 				// shell movement
-				for (j = 0;j < numShells;j += 1) {
-					if (shells[j].y <= -SPRITE_HEIGHT && shells[j].y+shells[j].vy > -SPRITE_HEIGHT) {
-						shells[j].y+=shells[j].vy;
+				for (j = 0; j < numShells; j += 1) {
+					if (shells[j].y <= -SPRITE_HEIGHT && shells[j].y + shells[j].vy > -SPRITE_HEIGHT) {
+						shells[j].y += shells[j].vy;
 						shells[j].vy = 0;
 					} else {
-						shells[j].y+=shells[j].vy;
+						shells[j].y += shells[j].vy;
 					}
 
-					shells[j].x+=shells[j].vx;
+					shells[j].x += shells[j].vx;
 
 					if (shells[j].x <= 0) { // bounce off left wall
 						shells[j].x = 0;
-						shells[j].vx*=-1;
+						shells[j].vx *= -1;
 					}
 
-					if (shells[j].x >= WIDTH-SPRITE_WIDTH) { // bounce off right wall
-						shells[j].x = WIDTH-SPRITE_WIDTH;
-						shells[j].vx*=-1;
+					if (shells[j].x >= WIDTH - SPRITE_WIDTH) { // bounce off right wall
+						shells[j].x = WIDTH - SPRITE_WIDTH;
+						shells[j].vx *= -1;
 					}
 
-					if (shells[j].y >= HEIGHT-SPRITE_HEIGHT) { // bounce off ground
-						shells[j].y = HEIGHT-SPRITE_HEIGHT;
-						shells[j].vy = -rand(3.0,6.5);
+					if (shells[j].y >= HEIGHT - SPRITE_HEIGHT) { // bounce off ground
+						shells[j].y = HEIGHT - SPRITE_HEIGHT;
+						shells[j].vy = -rand(3.0, 6.5);
 					}
 
 					// gravity pulls
-					//shells[j].vy = Math.min(shells[j].vy+GRAV,6);
-					shells[j].vy+=GRAV;
+					//shells[j].vy = Math.min(shells[j].vy + GRAV, 6);
+					shells[j].vy += GRAV;
 				}
 
 				// stars movement
-				for (j = 0;j < stars.length;j += 1) {
+				for (j = 0; j < stars.length; j += 1) {
 					if (stars[j].timeToLive > 0.0) {
-						stars[j].x+=Math.cos(Math.toRadians(stars[j].angle))*stars[j].velocity;
-						stars[j].y+=Math.sin(Math.toRadians(stars[j].angle))*stars[j].velocity;
-						stars[j].timeToLive-=1.0;
+						stars[j].x += Math.cos(Math.toRadians(stars[j].angle)) * stars[j].velocity;
+						stars[j].y += Math.sin(Math.toRadians(stars[j].angle)) * stars[j].velocity;
+						stars[j].timeToLive -= 1.0;
 					}
 				}
 
 				// points movement
-				for (j = 0;j < points.length;j += 1) {
+				for (j = 0; j < points.length; j += 1) {
 					if (points[j].life > 0) {
 						points[j].y -= 1;
 						points[j].life -= 1;
@@ -643,12 +638,12 @@
 				}
 
 				// collision detection
-				src = new Rectangle(0,0,SPRITE_WIDTH,SPRITE_HEIGHT);
-				target = new Rectangle(0,0,SPRITE_WIDTH,SPRITE_HEIGHT);
-				for (n = 0;n < numShells;n += 1) {
+				src = new Rectangle(0, 0, SPRITE_WIDTH, SPRITE_HEIGHT);
+				target = new Rectangle(0, 0, SPRITE_WIDTH, SPRITE_HEIGHT);
+				for (n = 0; n < numShells; n += 1) {
 					if (shells[n].y >= 0) {
 						// collision with bullets
-						for (j = 0;j < bullets.length;j += 1) {
+						for (j = 0; j < bullets.length; j += 1) {
 							if (bullets[j].y >= 0) {
 								src.x = bullets[j].x;
 								src.y = bullets[j].y;
@@ -656,14 +651,14 @@
 								target.y = shells[n].y;
 								if (src.intersects(target)) { // collision
 									bullets[j].y = -SPRITE_HEIGHT; // bullet disappears
-									hitShell(n,0);
+									hitShell(n, 0);
 									break;
 								}
 							}
 						}
 
 						// collision with red stars
-						for (j = 0;j < stars.length;j += 1) {
+						for (j = 0; j < stars.length; j += 1) {
 							if (stars[j].y >= 0.0 && stars[j].timeToLive > 0.0) {
 								src.x = stars[j].x;
 								src.y = stars[j].y;
@@ -671,7 +666,7 @@
 								target.y = shells[n].y;
 								if (target.y >= 0 && src.intersects(target)) { // collision
 									stars[j].timeToLive = 0.0;
-									hitShell(n,stars[j].scoreAmount);
+									hitShell(n, stars[j].scoreAmount);
 									break;
 								}
 							}
@@ -683,25 +678,25 @@
 						if (!squished && blinkTime <= 0 && target.intersects(beetleBounds)) { // collision
 							squished = true;
 							squishTime = 0;
-							pressMax+=3;
+							pressMax += 3;
 							pressCount = 0;
 						}
 					}
 				}
 
 				// bullet collision with bomb
-				for (j = 0;j < bullets.length;j += 1) {
+				for (j = 0; j < bullets.length; j += 1) {
 					if (bullets[j].y >= 0) {
 						src.x = bullets[j].x;
 						src.y = bullets[j].y;
 						r = new Rectangle(bombBounds);
 						if (bombDir !== 0) {
-							r.x = WIDTH-bombBounds.x;
+							r.x = WIDTH - bombBounds.x;
 						}
 						if (src.intersects(r)) {
 							bullets[j].y = -SPRITE_HEIGHT; // bullet disappears
 							clearAllShells(9);
-							bombScore = score+500;
+							bombScore = score + 500;
 							msg[0] = 0;
 							msg[1] = 1000;
 							bombBounds.x = -images.bomb.width;
@@ -713,12 +708,12 @@
 				if (heartBounds.y > -images.heart.height) {
 					heartBounds.y += 1;
 					if (beetleBounds.intersects(heartBounds)) { // collision with beetle
-						pressMax = Math.max(0,pressMax-3);
-						heartBounds.y = HEIGHT+images.heart.height;
+						pressMax = Math.max(0, pressMax - 3);
+						heartBounds.y = HEIGHT + images.heart.height;
 						msg[0] = 1;
 						msg[1] = 1000;
 					}
-					if (heartBounds.y >= HEIGHT+images.heart.height) {
+					if (heartBounds.y >= HEIGHT + images.heart.height) {
 						heartBounds.x = -images.heart.width;
 						heartBounds.y = -images.heart.height;
 					}
@@ -726,16 +721,16 @@
 			}
 
 			// animTime applies to both shells and stars (both have 4 frames of animation)
-			animTime+=delta;
+			animTime += delta;
 			if (state === STATE_TITLE) {
 				while (animTime >= 200) {
 					animFrame = (animFrame + 1) % 4;
-					animTime-=200;
+					animTime -= 200;
 				}
 			} else {
 				while (animTime >= 50) {
 					animFrame = (animFrame + 1) % 4;
-					animTime-=50;
+					animTime -= 50;
 				}
 			}
 
@@ -748,7 +743,7 @@
 			// spacebar pressed while squished
 			if (state === STATE_GAME) {
 				if (squished) {
-					squishTime+=delta;
+					squishTime += delta;
 					if (isKeyDown(keys.spacebar)) {
 						pressCount += 1;
 						keys[keys.spacebar] = -1;
@@ -758,7 +753,7 @@
 						squished = false;
 						pressCount = 0;
 						squishTime = 0;
-						blinkTime = MAX_BLINK_TIME;			
+						blinkTime = MAX_BLINK_TIME;
 					} else if (squishTime >= 5000) {
 						state = STATE_GAME_OVER;
 					}
@@ -794,24 +789,24 @@
 
 			if (state === STATE_GAME) {
 				if (bombBounds.x > -images.bomb.width) {
-					ctx.drawImage(images.bomb, (!bombDir && bombBounds.x) || WIDTH-bombBounds.x, bombBounds.y - 59);
+					ctx.drawImage(images.bomb, (!bombDir && bombBounds.x) || WIDTH - bombBounds.x, bombBounds.y - 59);
 				}
 
 				if (blinkTime <= 0 || blinkState === 0) {
 					ctx.drawImage(images.beetle[beetleFrame + (squished && 2) || 0], beetleBounds.x, beetleBounds.y);
 				}
 
-				for (j = 0;j < numShells;j += 1) {
+				for (j = 0; j < numShells; j += 1) {
 					drawShell(ctx, shells[j].x, shells[j].y, animFrame);
 				}
 
-				for (j = 0;j  < bullets.length;j += 1) {
+				for (j = 0; j  < bullets.length; j += 1) {
 					if (bullets[j].y > -SPRITE_HEIGHT) {
 						drawStar(ctx, bullets[j].x, bullets[j].y, animFrame);
 					}
 				}
 
-				for (j = 0;j < stars.length;j += 1) {
+				for (j = 0; j < stars.length; j += 1) {
 					if (stars[j].timeToLive > 0.0) {
 						drawStar(ctx, stars[j].x, stars[j].y, 4 + animFrame);
 					}
@@ -823,7 +818,7 @@
 				ctx.drawImage(images.timeLeft, 5, 5);
 				drawTime(ctx, String(mins) + ':' + ((secs < 10 && '0' + String(secs)) || String(secs)), images.timeLeft.width + 10, 5);
 
-				for (j = 0;j < points.length;j += 1) {
+				for (j = 0; j < points.length; j += 1) {
 					if (points[j].life > 0) {
 						drawText(ctx, String(points[j].score), points[j].x, points[j].y);
 					}
