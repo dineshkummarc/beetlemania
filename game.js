@@ -132,7 +132,6 @@
 				score: null,
 				bg: null,
 				beetle: null,
-				star: null,
 				digits: null,
 				timer: null,
 				heart: null,
@@ -211,11 +210,6 @@
 				images.beetle = [];
 				for (j = 0;j < 4;j += 1) {
 					images.beetle[j] = getSubImage(files.sprites, j * SPRITE_WIDTH, 0, SPRITE_WIDTH, SPRITE_HEIGHT);
-				}
-
-				images.star = [];
-				for (j = 8;j < 16;j += 1) {
-					images.star[j - 8] = getSubImage(files.sprites, j * SPRITE_WIDTH, 0, SPRITE_WIDTH, SPRITE_HEIGHT);
 				}
 
 				images.timer = [];
@@ -463,13 +457,19 @@
 			ctx.drawImage(images.digits, n * 25, 0, 25, 26, x, y, 25, 26); 
 		}
 
-		function drawShell(ctx, x, y, animFrame) {
-			ctx.drawImage(
-				images.sprites,
-				(4 * SPRITE_WIDTH) + animFrame * SPRITE_WIDTH, 0,
-				SPRITE_WIDTH, SPRITE_HEIGHT,
+		function drawSprite(ctx, x, y, offset) {
+			ctx.drawImage(images.sprites,
+				offset, 0, SPRITE_WIDTH, SPRITE_HEIGHT,
 				x, y, SPRITE_WIDTH, SPRITE_HEIGHT
 			);
+		}
+
+		function drawShell(ctx, x, y, animFrame) {
+			drawSprite(ctx, x, y, 4 * SPRITE_WIDTH + animFrame * SPRITE_WIDTH);
+		}
+
+		function drawStar(ctx, x, y, animFrame) {
+			drawSprite(ctx, x, y, 8 * SPRITE_WIDTH + animFrame * SPRITE_WIDTH);
 		}
 
 		function drawTime(ctx, str, x, y) {
@@ -842,13 +842,13 @@
 
 				for (j = 0;j  < bullets.length;j++) {
 					if (bullets[j].y > -SPRITE_HEIGHT) {
-						ctx.drawImage(images.star[animFrame], bullets[j].x, bullets[j].y);
+						drawStar(ctx, bullets[j].x, bullets[j].y, animFrame);
 					}
 				}
 
 				for (j = 0;j < stars.length;j++) {
 					if (stars[j].timeToLive > 0.0) {
-						ctx.drawImage(images.star[4 + animFrame], stars[j].x, stars[j].y);
+						drawStar(ctx, stars[j].x, stars[j].y, 4 + animFrame);
 					}
 				}
 
