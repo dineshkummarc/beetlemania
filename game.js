@@ -108,18 +108,8 @@
 			STATE_TITLE = 0,
 			STATE_GAME = 1,
 			STATE_GAME_OVER = 2,
-			STATE_INPUT = 3,
-			STATE_SUBMITTING = 4,
-			STATE_ERROR = 5,
-			STATE_SCORES = 6,
 			GAME_DURATION = 3*60*1000,
 			state, // game state
-			beetle = [],
-			shell = [],
-			star = [],
-			digits = [],
-			timer = [],
-			heart,
 			fontCharMap = {
 				'_': 36,
 				'-': 37,
@@ -236,18 +226,6 @@
 					callback();
 				}
 			};
-		}
-
-		function resetShell(j) {
-			shells[j].x = rand(0,WIDTH); // x
-			shells[j].y = -SPRITE_HEIGHT; // y
-			shells[j].vx = 2.0;
-			shells[j].vy = 0.0; // y velocity
-
-			points[j].x = 0; // x
-			points[j].y = 0; // y
-			points[j].score = 0; // score
-			points[j].life = 0; // life
 		}
 
 		function clearAllShells(scr) {
@@ -401,7 +379,6 @@
 		}
 
 		function init() {
-			var j;
 			showFPS = false;
 			bullets = createArray(10);
 			shells = createArray(35);
@@ -435,11 +412,6 @@
 			}
 
 			return 41;
-		}
-
-		function isCharSupported(chr) {
-			var x = chr.toUpperCase().charCodeAt(0);
-			return ((x >= 65 && x <= 90) || (x >= 48 && x <= 57) || typeof fontCharMap[chr] === 'number');
 		}
 
 		function drawText(ctx, str, x, y) {
@@ -755,7 +727,7 @@
 
 			// animTime applies to both shells and stars (both have 4 frames of animation)
 			animTime+=delta;
-			if (state === STATE_TITLE || state === STATE_SCORES) {
+			if (state === STATE_TITLE) {
 				while (animTime >= 200) {
 					animFrame = (animFrame + 1) % 4;
 					animTime-=200;
@@ -802,12 +774,6 @@
 					reset();
 					state = STATE_GAME;
 				}
-			} else if (state === STATE_SCORES || state === STATE_ERROR) {
-				if (isKeyDown(keys.spacebar)) {
-					keys[keys.spacebar] = -1;
-					reset();
-					state = STATE_GAME;
-				}
 			}
 
 			if (state === STATE_GAME && squishTime >= 5000) {
@@ -816,7 +782,7 @@
 		}
 
 		function render(ctx) {
-			var j, w, secs, mins, str;
+			var j, secs, mins;
 
 			ctx.fillStyle = BG;
 			ctx.fillRect(0, 0, width, height);
