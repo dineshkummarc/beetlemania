@@ -143,6 +143,7 @@
 				highscores: null,
 				timeLeft: null
 			},
+			scores,
 			beetleBounds,
 			heartBounds,
 			bombBounds,
@@ -343,27 +344,6 @@
 			return (keys[code] === 1);
 		}
 
-		function init() {
-			var j;
-			showFPS = false;
-			bullets = createArray(10);
-			shells = createArray(35);
-			points = createArray(shells.length); // points is the score increase displayed on the screen
-
-			// there are NUM_STARS stars per shell
-			stars = createArray(NUM_STARS * shells.length);
-
-			// big messages on screen
-			msg = [];
-			msg[0] = 0; // message type (index to images.messages[])
-			msg[1] = 0; // time to live (in milliseconds)
-
-			pressCount = 0;
-			scroll = 0;
-			done = false;
-			reset();
-		}
-
 		function reset() {
 			var j;
 			score = 0;
@@ -420,6 +400,28 @@
 			state = STATE_TITLE;
 		}
 
+		function init() {
+			var j;
+			showFPS = false;
+			bullets = createArray(10);
+			shells = createArray(35);
+			points = createArray(shells.length); // points is the score increase displayed on the screen
+
+			// there are NUM_STARS stars per shell
+			stars = createArray(NUM_STARS * shells.length);
+
+			// big messages on screen
+			msg = [];
+			msg[0] = 0; // message type (index to images.messages[])
+			msg[1] = 0; // time to live (in milliseconds)
+
+			pressCount = 0;
+			scroll = 0;
+			done = false;
+			reset();
+		}
+
+
 		function getChar(chr) { 
 			var x = chr.toUpperCase().charCodeAt(0);
 
@@ -437,15 +439,15 @@
 
 		function isCharSupported(chr) {
 			var x = chr.toUpperCase().charCodeAt(0);
-			return ((x >= 65 && x <= 90) || (x >= 48 && x <= 57) || typeof fontCharMap[c] === 'number');
+			return ((x >= 65 && x <= 90) || (x >= 48 && x <= 57) || typeof fontCharMap[chr] === 'number');
 		}
 
 		function drawText(ctx, str, x, y) {
-			var j, startx = 0 + x;
+			var j, startx = x;
 			for (j = 0; j < str.length; j += 1) {
 				if (str.charAt(j) === '\n') {
 					y += 16 + 8;
-					x = 0 + startx;
+					x = startx;
 				} else {
 					x += 16;
 					ctx.drawImage(images.font, 0, getChar(str.charAt(j)) * 16, 16, 16, x - 16, y, 16, 16); 
@@ -482,7 +484,7 @@
 					n = 10;
 					w = -5;
 				} else {
-					n = parseInt(str.charAt(j));
+					n = parseInt(str.charAt(j), 10);
 					if (j < str.length - 1 && str.charAt(j + 1) === ':') {
 						w = -5;
 					}
@@ -499,7 +501,7 @@
 			x = WIDTH - 5;
 			for (j = s.length-1; j >= 0; j -= 1) {
 				x -= 25;
-				drawDigit(ctx, parseInt(s.charAt(j)), x, 5);
+				drawDigit(ctx, parseInt(s.charAt(j), 10), x, 5);
 			}
 
 			ctx.drawImage(images.score, x - images.score.width - 5, 5);
@@ -527,9 +529,10 @@
 						old = numShells;
 						numShells = Math.min(numShells+rand(3,7),maxShells);
 						inc = 2;
-						for (old = old;old < numShells;old += 1) {
+						while (old < numShells) {
 							shells[old].y -= SPRITE_HEIGHT * inc;
 							inc*=2;
+							old += 1;
 						}
 					}
 					if (score >= bombScore && bombBounds.x <= -images.bomb.width && rand(0,100) <= 2) {
@@ -553,13 +556,13 @@
 				bgTime-=25;
 
 				if (blinkTime > 0) {
-					blinkState ^= 1;
+					blinkState = (!blinkState && 1) || 0;
 				}
 			}
 
 			beetleTime += delta;
 			while (beetleTime >= 100) {
-				beetleFrame ^= 1;
+				beetleFrame = (!beetleFrame && 1) || 0;
 				beetleTime -= 100;
 			}
 
@@ -605,7 +608,7 @@
 					for (j = 0;j < bullets.length;j += 1) {
 						if (bullets[j].y <= -SPRITE_HEIGHT) {
 							bullets[j].x = beetleBounds.x;
-							bullets[j].y = beetleBounds.y-(SPRITE_HEIGHT>>1);
+							bullets[j].y = beetleBounds.y-(SPRITE_HEIGHT / 2);
 							break;
 						}
 					}
@@ -725,7 +728,9 @@
 					src.x = bullets[j].x;
 					src.y = bullets[j].y;
 					r = new Rectangle(bombBounds);
-					if (bombDir != 0) r.x = WIDTH-bombBounds.x;
+					if (bombDir !== 0) {
+						r.x = WIDTH-bombBounds.x;
+					}
 					if (src.intersects(r)) {
 						bullets[j].y = -SPRITE_HEIGHT; // bullet disappears
 						clearAllShells(9);
@@ -756,14 +761,12 @@
 			animTime+=delta;
 			if (state === STATE_TITLE || state === STATE_SCORES) {
 				while (animTime >= 200) {
-					animFrame += 1;
-					if (animFrame === 4) animFrame = 0;
+					animFrame = (animFrame + 1) % 4;
 					animTime-=200;
 				}
 			} else {
 				while (animTime >= 50) {
-					animFrame += 1;
-					if (animFrame === 4) animFrame = 0;
+					animFrame = (animFrame + 1) % 4;
 					animTime-=50;
 				}
 			}
@@ -898,7 +901,7 @@
 			} else if (state === STATE_GAME_OVER) {
 				ctx.drawImage(images.gameOver, (WIDTH / 2) - (images.gameOver.width / 2), 10);
 				drawText(ctx, 'Your Score: ' + score + '\n\n-Press -R- to restart game', 10, 150);
-				ctx.drawImage(images.beetle[(squished && 2 || 0)], beetleBounds.x, beetleBounds.y);
+				ctx.drawImage(images.beetle[(squished && 2) || 0], beetleBounds.x, beetleBounds.y);
 			}
 
 			if (showFPS) {
