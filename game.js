@@ -108,10 +108,14 @@
 
 		if (typeof window.webkitAudioContext !== 'function') {
 			return function (src, callback) {
-				var sound = document.createElement('audio');
-				sound.addEventListener('canplay', function () {
+				var sound = new Audio();
+
+				function loadCallback() {
 					callback(createSoundPool(sound, 10));
-				});
+					sound.removeEventListener('canplay', loadCallback, false);
+				}
+
+				sound.addEventListener('canplay', loadCallback, false);
 				sound.src = src;
 			};
 		}
