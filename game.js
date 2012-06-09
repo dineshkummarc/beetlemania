@@ -74,6 +74,30 @@
 		}
 	}
 
+	function createSoundPool(sound, size) {
+		var j = 0, pool = [sound];
+
+		function loop() {
+			var looped = sound.cloneNode(true);
+			looped.loop = true;
+			return looped.play();
+		}
+
+		function play() {
+			var result = pool[j].play();
+			j += 1;
+			while (j >= pool.length) {
+				if (pool.length < size) {
+					pool.push(sound.cloneNode(true));
+				} else {
+					j %= size;
+				}
+			}
+
+			return result;
+		}
+		return { play: play, loop: loop };
+	}
 
 	loadSound = (function () {
 		var context, emptySound;
@@ -86,13 +110,7 @@
 			return function (src, callback) {
 				var sound = document.createElement('audio');
 				sound.addEventListener('canplay', function () {
-					callback({
-						play: sound.play,
-						loop: function () {
-							sound.loop = true;
-							return sound.play();
-						}
-					});
+					callback(createSoundPool(sound, 10));
 				});
 				sound.src = src;
 			};
