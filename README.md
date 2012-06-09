@@ -11,6 +11,6 @@ TODO:
 * Restore sounds/music
 * Restore highscore functionality
 
-Playable at http://code.mattcampbell.net/beetlemania/raw-file/tip/index.html
+Playable at http://dysfunction.github.com/beetlemania/
 
 ![Screenshot](http://javaunlimited.net/beetlemania/img/screen.gif)
