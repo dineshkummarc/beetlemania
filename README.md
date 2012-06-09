@@ -8,7 +8,7 @@ I originally wrote this in Java in 2006. This is a direct port to JavaScript/Can
 TODO:
 --
 
-* Restore sounds/music
+* ~~Restore sounds/music~~
 * Restore highscore functionality
 
 Playable at http://dysfunction.github.com/beetlemania/
