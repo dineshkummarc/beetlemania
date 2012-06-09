@@ -45,13 +45,13 @@
 
 		newState.buttons.forEach(function (buttonValue, buttonId) {
 			if (oldState.buttons[buttonId] !== buttonValue) {
-				diff.buttons[buttonId] = +(buttonValue - oldState.buttons[buttonId]).toFixed(1);
+				diff.buttons[buttonId] = buttonValue - oldState.buttons[buttonId];
 			}
 		});
 
 		newState.axes.forEach(function (axisValue, axisId) {
 			if (oldState.axes[axisId] !== axisValue) {
-				diff.axes[axisId] = axisValue - oldState.axes[axisId];
+				diff.axes[axisId] = +(axisValue - oldState.axes[axisId]).toFixed(1);
 			}
 		});
 
