@@ -26,6 +26,15 @@
 		return window.navigator.webkitGamepads[index];
 	}
 
+	function probeGamepads() {
+		var j;
+		if (typeof window.navigator.webkitGamepads !== 'undefined') {
+			for (j = 0;j < window.navigator.webkitGamepads; j += 1) {
+				getGamepad(index);
+			}
+		}
+	}
+
 	function getGamepadState(gamepadIndex) {
 		var gamepad = getGamepad(gamepadIndex);
 
@@ -133,5 +142,6 @@
 		this.listeners[eventName].push(callback);
 	};
 
+	probeGamepads();
 	window.Gamepad = Gamepad;
 }(this));
