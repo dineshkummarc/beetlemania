@@ -47,19 +47,6 @@
 		return result;
 	}
 
-	function getSubImage(image, x, y, width, height) {
-		var canvas, ctx;
-
-		canvas = document.createElement('canvas');
-		canvas.width = width;
-		canvas.height = height;
-
-		ctx = canvas.getContext('2d');
-		ctx.drawImage(image, -x, -y);
-
-		return canvas;
-	}
-
 	Math.toRadians = Math.toRadians || function (degrees) {
 		return degrees * (Math.PI / 180);
 	};
@@ -279,19 +266,9 @@
 				sounds.click_low = soundFiles.click_low;
 				sounds.fire = soundFiles.fire;
 				sounds.music = soundFiles.music;
-
-				images.beetle = [];
-				for (j = 0; j < 4; j += 1) {
-					images.beetle[j] = getSubImage(imageFiles.sprites, j * SPRITE_WIDTH, 0, SPRITE_WIDTH, SPRITE_HEIGHT);
-				}
-
-				images.timer = [];
-				for (j = 0; j < 3; j += 1) {
-					images.timer[j] = getSubImage(imageFiles.sprites2, j * 24, 0, 24, 26);
-				}
-
 				images.sprites = imageFiles.sprites;
-				images.heart = getSubImage(imageFiles.sprites2, images.timer.length * 24, 2, 22, 22);
+				images.sprites2 = imageFiles.sprites2;
+				images.heart = { width: 22, height: 22 };
 				images.messages = [imageFiles.great, imageFiles.hp, imageFiles.nice];
 				images.bomb = imageFiles.bomb;
 				images.space = imageFiles.space;
@@ -556,6 +533,14 @@
 			ctx.drawImage(images.sprites, offset, 0, SPRITE_WIDTH, SPRITE_HEIGHT, x, y, SPRITE_WIDTH, SPRITE_HEIGHT);
 		}
 
+		function drawTimer(ctx, x, y, offset) {
+			ctx.drawImage(images.sprites2, offset * 24, 0, 24, 26, x, y, 24, 26);
+		}
+
+		function drawHeart(ctx, x, y) {
+			ctx.drawImage(images.sprites2, 72, 0, 22, 22, x, y, 22, 22);
+		}
+
 		function drawShell(ctx, x, y, animFrame) {
 			drawSprite(ctx, x, y, 4 * SPRITE_WIDTH + animFrame * SPRITE_WIDTH);
 		}
@@ -563,6 +548,11 @@
 		function drawStar(ctx, x, y, animFrame) {
 			drawSprite(ctx, x, y, 8 * SPRITE_WIDTH + animFrame * SPRITE_WIDTH);
 		}
+
+		function drawBeetle(ctx, x, y, animFrame) {
+			drawSprite(ctx, x, y, animFrame * SPRITE_WIDTH);
+		}
+
 
 		function drawTime(ctx, str, x, y) {
 			var n, w, j;
@@ -925,7 +915,7 @@
 				}
 
 				if (blinkTime <= 0 || blinkState === 0) {
-					ctx.drawImage(images.beetle[beetleFrame + (squished && 2) || 0], beetleBounds.x, beetleBounds.y);
+					drawBeetle(ctx, beetleBounds.x, beetleBounds.y, beetleFrame + (squished && 2) || 0);
 				}
 
 				for (j = 0; j < numShells; j += 1) {
@@ -968,11 +958,11 @@
 							j = 0;
 						}
 
-						ctx.drawImage(images.timer[j], beetleBounds.x, beetleBounds.y - beetleBounds.height - 12);
+						drawTimer(ctx, beetleBounds.x, beetleBounds.y - beetleBounds.height - 12, j);
 					}
 				}
 
-				ctx.drawImage(images.heart, heartBounds.x, heartBounds.y);
+				drawHeart(ctx, heartBounds.x, heartBounds.y);
 
 				// big message on screen ("nice!" / "great!" / "hp + 1")
 				if (msg[1] > 0) {
@@ -990,7 +980,7 @@
 			} else if (state === STATE_GAME_OVER) {
 				ctx.drawImage(images.gameOver, (WIDTH / 2) - (images.gameOver.width / 2), 10);
 				drawText(ctx, 'Your Score: ' + score + '\n\n-Press -R- to restart game', 10, 150);
-				ctx.drawImage(images.beetle[(squished && 2) || 0], beetleBounds.x, beetleBounds.y);
+				drawBeetle(ctx, beetleBounds.x, beetleBounds.y, (squished && 2) || 0);
 			}
 
 			if (showFPS) {
