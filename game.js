@@ -1,6 +1,6 @@
 (function (window, document, Gamepad) {
 	"use strict";
-	var width = 512, height = 448, frameCount = 0, repaint, context, lastUpdate, game, Rectangle;
+	var width = 512, height = 448, frameCount = 0, repaint, context, lastUpdate, game, Rectangle, loadSound, soundVolume = null;
 
 	function createCanvas(width, height, node) {
 		var canvas = document.createElement('canvas');
@@ -87,13 +87,73 @@
 		}
 	}
 
+
+	loadSound = (function () {
+		var context, emptySound;
+		emptySound = {
+			play: function () {},
+			loop: function () {}
+		};
+
+		if (typeof webkitAudioContext !== 'function') {
+			return function (src, callback) {
+				var sound = document.createElement('audio');
+				sound.addEventListener('canplay', function () {
+					callback({
+						play: sound.play,
+						loop: function () {
+							sound.loop = true;
+							return sound.play();
+						}
+					});
+				});
+				sound.src = src;
+			};
+		}
+		context = new webkitAudioContext();
+		soundVolume = context.createGainNode();
+		soundVolume.connect(context.destination);
+
+		return function (src, callback) {
+			var sound, request = new XMLHttpRequest();
+			request.open('GET', src, true);
+			request.responseType = 'arraybuffer';
+			request.onload = function () {
+				context.decodeAudioData(request.response, function (buffer) {
+					sound = buffer;
+					postLoad();
+				}, function error() {
+					callback(emptySound);
+				});
+			};
+			request.send();
+
+			function postLoad() {
+				callback({
+					play: function () {
+						var source = context.createBufferSource();
+						source.buffer = sound;
+						source.connect(soundVolume);
+						source.noteOn(0);
+					},
+					loop: function () {
+						var source = context.createBufferSource();
+						source.loop = true;
+						source.buffer = sound;
+						source.connect(soundVolume);
+						source.noteOn(0);
+					}
+				});
+			}
+		};
+	}());
+
 	function init() {
 		context = createCanvas(width, height, document.body);
-		game.loadImages(game.init);
+		game.loadAssets(game.init);
 		lastUpdate = Date.now();
 		update(lastUpdate);
 	}
-
 
 	game = (function () {
 		var keys,
@@ -134,6 +194,8 @@
 				highscores: null,
 				timeLeft: null
 			},
+			sounds = {},
+			mute = false,
 			scores,
 			beetleBounds,
 			heartBounds,
@@ -176,22 +238,35 @@
 			right: 39,
 			down: 40,
 			f: 70,
+			m: 77,
 			r: 82
 		};
 
-		function loadImages(callback) {
-			var files, count, postLoad;
-			files = ['bg', 'bomb', 'digits', 'font', 'gameover', 'great', 'highscores', 'hp', 'nice', 'score', 'space', 'sprites2', 'sprites', 'time', 'title'];
+		function loadAssets(callback) {
+			var imageFiles, soundFiles, count, postLoad;
+			imageFiles = ['bg', 'bomb', 'digits', 'font', 'gameover', 'great', 'highscores', 'hp', 'nice', 'score', 'space', 'sprites2', 'sprites', 'time', 'title'];
+			soundFiles = ['click_high', 'click_low', 'fire', 'music'];
 			count = 0;
 
-			files.forEach(function (file) {
+			function assetLoaded() {
+				count += 1;
+				if (count === soundFiles.length + imageFiles.length) {
+					postLoad();
+				}
+			}
+
+			soundFiles.forEach(function (file) {
+				var sound = loadSound('sounds/' + file + '.ogg', function (sound) {
+					soundFiles[file] = sound;
+					assetLoaded();
+				});
+			});
+
+			imageFiles.forEach(function (file) {
 				var image = new window.Image();
 				image.onload = function () {
-					files[file] = image;
-					count += 1;
-					if (count === files.length) {
-						postLoad();
-					}
+					imageFiles[file] = image;
+					assetLoaded();
 				};
 
 				image.src = 'images/' + file + '.gif';
@@ -200,29 +275,34 @@
 			postLoad = function () {
 				var j;
 
+				sounds.click_high = soundFiles.click_high;
+				sounds.click_low = soundFiles.click_low;
+				sounds.fire = soundFiles.fire;
+				sounds.music = soundFiles.music;
+
 				images.beetle = [];
 				for (j = 0; j < 4; j += 1) {
-					images.beetle[j] = getSubImage(files.sprites, j * SPRITE_WIDTH, 0, SPRITE_WIDTH, SPRITE_HEIGHT);
+					images.beetle[j] = getSubImage(imageFiles.sprites, j * SPRITE_WIDTH, 0, SPRITE_WIDTH, SPRITE_HEIGHT);
 				}
 
 				images.timer = [];
 				for (j = 0; j < 3; j += 1) {
-					images.timer[j] = getSubImage(files.sprites2, j * 24, 0, 24, 26);
+					images.timer[j] = getSubImage(imageFiles.sprites2, j * 24, 0, 24, 26);
 				}
 
-				images.sprites = files.sprites;
-				images.heart = getSubImage(files.sprites2, images.timer.length * 24, 2, 22, 22);
-				images.messages = [files.great, files.hp, files.nice];
-				images.bomb = files.bomb;
-				images.space = files.space;
-				images.title = files.title;
-				images.gameOver = files.gameover;
-				images.highscores = files.highscores;
-				images.timeLeft = files.time;
-				images.score = files.score;
-				images.bg = files.bg;
-				images.digits = files.digits;
-				images.font = files.font;
+				images.sprites = imageFiles.sprites;
+				images.heart = getSubImage(imageFiles.sprites2, images.timer.length * 24, 2, 22, 22);
+				images.messages = [imageFiles.great, imageFiles.hp, imageFiles.nice];
+				images.bomb = imageFiles.bomb;
+				images.space = imageFiles.space;
+				images.title = imageFiles.title;
+				images.gameOver = imageFiles.gameover;
+				images.highscores = imageFiles.highscores;
+				images.timeLeft = imageFiles.time;
+				images.score = imageFiles.score;
+				images.bg = imageFiles.bg;
+				images.digits = imageFiles.digits;
+				images.font = imageFiles.font;
 
 				if (typeof callback === 'function') {
 					callback();
@@ -397,7 +477,6 @@
 				try {
 					gamepad = new Gamepad();
 				} catch (err) {
-					console.log(err.message);
 					gamepad = null;
 					return;
 				}
@@ -439,6 +518,7 @@
 			done = false;
 			reset();
 			initGamepad();
+			sounds.music.loop();
 		}
 
 		function getChar(chr) {
@@ -519,6 +599,11 @@
 
 		function update(delta) {
 			var old, inc, j, src, target, n, r;
+
+			if (soundVolume && isKeyDown(keys.m)) {
+				soundVolume.gain.value = (!soundVolume.gain.value && 1) || 0;
+				keys[keys.m] = -1;
+			}
 
 			if (blinkTime > 0) {
 				blinkTime = Math.max(blinkTime - delta, 0);
@@ -619,6 +704,7 @@
 						if (bullets[j].y <= -SPRITE_HEIGHT) {
 							bullets[j].x = beetleBounds.x;
 							bullets[j].y = beetleBounds.y - (SPRITE_HEIGHT / 2);
+							sounds.fire.play();
 							break;
 						}
 					}
@@ -694,6 +780,7 @@
 								target.y = shells[n].y;
 								if (src.intersects(target)) { // collision
 									bullets[j].y = -SPRITE_HEIGHT; // bullet disappears
+									sounds.click_low.play();
 									hitShell(n, 0);
 									break;
 								}
@@ -709,6 +796,7 @@
 								target.y = shells[n].y;
 								if (target.y >= 0 && src.intersects(target)) { // collision
 									stars[j].timeToLive = 0.0;
+									sounds.click_high.play();
 									hitShell(n, stars[j].scoreAmount);
 									break;
 								}
@@ -738,6 +826,7 @@
 						}
 						if (src.intersects(r)) {
 							bullets[j].y = -SPRITE_HEIGHT; // bullet disappears
+							sounds.click_low.play();
 							clearAllShells(9);
 							bombScore = score + 500;
 							msg[0] = 0;
@@ -936,7 +1025,7 @@
 			render: render,
 			update: update,
 			init: init,
-			loadImages: loadImages
+			loadAssets: loadAssets
 		});
 	}());
 
