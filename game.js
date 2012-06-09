@@ -82,7 +82,7 @@
 			loop: function () {}
 		};
 
-		if (typeof webkitAudioContext !== 'function') {
+		if (typeof window.webkitAudioContext !== 'function') {
 			return function (src, callback) {
 				var sound = document.createElement('audio');
 				sound.addEventListener('canplay', function () {
@@ -97,23 +97,12 @@
 				sound.src = src;
 			};
 		}
-		context = new webkitAudioContext();
+		context = new window.webkitAudioContext();
 		soundVolume = context.createGainNode();
 		soundVolume.connect(context.destination);
 
 		return function (src, callback) {
-			var sound, request = new XMLHttpRequest();
-			request.open('GET', src, true);
-			request.responseType = 'arraybuffer';
-			request.onload = function () {
-				context.decodeAudioData(request.response, function (buffer) {
-					sound = buffer;
-					postLoad();
-				}, function error() {
-					callback(emptySound);
-				});
-			};
-			request.send();
+			var sound, request = new window.XMLHttpRequest();
 
 			function postLoad() {
 				callback({
@@ -132,6 +121,18 @@
 					}
 				});
 			}
+
+			request.open('GET', src, true);
+			request.responseType = 'arraybuffer';
+			request.onload = function () {
+				context.decodeAudioData(request.response, function (buffer) {
+					sound = buffer;
+					postLoad();
+				}, function error() {
+					callback(emptySound);
+				});
+			};
+			request.send();
 		};
 	}());
 
@@ -182,7 +183,6 @@
 				timeLeft: null
 			},
 			sounds = {},
-			mute = false,
 			scores,
 			beetleBounds,
 			heartBounds,
@@ -243,7 +243,7 @@
 			}
 
 			soundFiles.forEach(function (file) {
-				var sound = loadSound('sounds/' + file + '.ogg', function (sound) {
+				loadSound('sounds/' + file + '.ogg', function (sound) {
 					soundFiles[file] = sound;
 					assetLoaded();
 				});
@@ -260,8 +260,6 @@
 			});
 
 			postLoad = function () {
-				var j;
-
 				sounds.click_high = soundFiles.click_high;
 				sounds.click_low = soundFiles.click_low;
 				sounds.fire = soundFiles.fire;
@@ -503,9 +501,13 @@
 
 			if (x >= 65 && x <= 90) { // A-Z
 				return x - 65;
-			} else if (x >= 48 && x <= 57) { // 0-9
+			}
+
+			if (x >= 48 && x <= 57) { // 0-9
 				return 26 + x - 48;
-			} else if (typeof fontCharMap[chr] === 'number') {
+			}
+
+			if (typeof fontCharMap[chr] === 'number') {
 				return fontCharMap[chr];
 			}
 
