@@ -540,7 +540,7 @@
 		}
 
 		function drawHeart(ctx, x, y) {
-			ctx.drawImage(images.sprites2, 72, 0, 22, 22, x, y, 22, 22);
+			ctx.drawImage(images.sprites2, 72, 0, 22, 23, x, y, 22, 23);
 		}
 
 		function drawShell(ctx, x, y, animFrame) {
