@@ -1,4 +1,4 @@
-(function (window, document) {
+(function (window, document, Gamepad) {
 	"use strict";
 	var width = 512, height = 448, frameCount = 0, repaint, context, lastUpdate, game, Rectangle;
 
@@ -166,6 +166,7 @@
 			showFPS,
 			pressCount, // times spacebar was pressed while squished
 			pressMax, // times spacebar must be pressed to recover from being squished
+			gamepad = null,
 			done;
 
 		keys = {
@@ -319,7 +320,20 @@
 		}
 
 		function isKeyDown(code) {
-			return (keys[code] === 1);
+			var down = keys[code] === 1;
+
+			/* Check gamepad */
+			if (!down && gamepad !== null) {
+				if (code === keys.left) {
+					return gamepad.state.axes[0] < -0.2;
+				}
+
+				if (code === keys.right) {
+					return gamepad.state.axes[0] > 0.2;
+				}
+			}
+
+			return down;
 		}
 
 		function reset() {
@@ -378,6 +392,34 @@
 			state = STATE_TITLE;
 		}
 
+		function initGamepad() {
+			if (!gamepad) {
+				try {
+					gamepad = new Gamepad();
+				} catch (err) {
+					console.log(err.message);
+					gamepad = null;
+					return;
+				}
+
+				gamepad.on('buttonpressed', function (e) {
+					if (e.buttonId === 8 || e.buttonId === 11) {
+						keys[keys.r] = 1;
+					} else {
+						keys[keys.spacebar] = 1;
+					}
+				});
+
+				gamepad.on('buttonreleased', function (e) {
+					if (e.buttonId === 8 || e.buttonId === 11) {
+						keys[keys.r] = 0;
+					} else {
+						keys[keys.spacebar] = 0;
+					}
+				});
+			}
+		}
+
 		function init() {
 			showFPS = false;
 			bullets = createArray(10);
@@ -396,6 +438,7 @@
 			scroll = 0;
 			done = false;
 			reset();
+			initGamepad();
 		}
 
 		function getChar(chr) {
@@ -945,4 +988,4 @@
 	};
 
 	init();
-}(this, this.document));
+}(this, this.document, this.Gamepad));
